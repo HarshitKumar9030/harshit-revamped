@@ -1,32 +1,10 @@
 ﻿"use client";
-import { useEffect, useState, useRef } from "react";
+import { useState } from "react";
 import { TextHoverEffect } from "@/components/ui/text-hover-effect";
 import { Shriju } from "@/components/sections/shriju";
-import { Heart } from "lucide-react";
 
 export function Footer() {
-  const [time, setTime] = useState("");
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [mousePos, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isHovered, setIsHovered] = useState(false);
   const [showShriju, setShowShriju] = useState(false);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    setMousePosition({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
-  };
-
-  useEffect(() => {
-    setTime(new Date().toLocaleTimeString("en-US", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit" }));
-    const interval = setInterval(() => {
-      setTime(new Date().toLocaleTimeString("en-US", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit" }));
-    }, 60000);
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <footer className="w-full bg-[#111111] text-[#FDFBF7] relative flex flex-col overflow-hidden px-4 md:px-12 py-16 md:py-24 border-none rounded-t-[2.5rem] -mt-8 z-20">
@@ -35,7 +13,15 @@ export function Footer() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-12 border-b border-[#FDFBF7]/10 pb-16 z-10 w-full">
         
         <div className="flex flex-col gap-4 max-w-lg w-full">
-          <span className="text-3xl tracking-tighter font-black uppercase" style={{ fontFamily: "var(--font-heading)" }}>Harshit <span className="text-[#D9ED92]">2026</span></span>
+          <button
+            type="button"
+            onClick={() => setShowShriju(true)}
+            className="w-fit text-3xl tracking-tighter font-black uppercase cursor-pointer"
+            style={{ fontFamily: "var(--font-heading)" }}
+            aria-label="Open Shriju"
+          >
+            Harshit <span className="text-[#D9ED92]">2026</span>
+          </button>
           <p className="text-sm md:text-base opacity-50 font-medium leading-relaxed">
             I design and engineer interactive web, software, and AI projects with a focus on clarity, performance, and meaningful user experience. Every project is an opportunity to blend technical depth with visual impact.
           </p>
@@ -71,12 +57,24 @@ export function Footer() {
       
       {/* Massive Typography */}
       <div 
-        className="w-full flex justify-center items-center mt-auto md:mt-24 select-none z-0 relative group py-12"
+        className="w-full flex justify-center items-center mt-auto md:mt-24 select-none z-0 relative group py-12 cursor-pointer"
+        role="button"
+        tabIndex={0}
+        aria-label="Open Shriju"
+        onClick={() => setShowShriju(true)}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            setShowShriju(true);
+          }
+        }}
       >
         <div className="w-full max-w-[90vw] md:max-w-none h-[20vh] md:h-[35vh]">
           <TextHoverEffect text="HARSHIT" />
         </div>
       </div>
+
+      <Shriju isOpen={showShriju} onClose={() => setShowShriju(false)} />
     </footer>
   );
 }

@@ -1,0 +1,312 @@
+---
+title: "Shipping A Full Spotify Real-Time Status App"
+date: "2026-04-19"
+excerpt: "A full production walkthrough: server-only Spotify client, now-playing API, refresh token flow, polling UI, and deploy checklist."
+tags: ["spotify", "nextjs", "api", "realtime", "production"]
+image: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853"
+---
+
+I wanted a tiny page that answers one question, live: what am I listening to right now?
+
+Built entirely with **Next.js** (App Router), this application provides a sleek, real-time look into your current Spotify playback state. Instead of reaching out to Spotify directly from the browser (and leaking your API secrets), we funnel everything through a secure, server-rendered Next.js backend. 
+
+Here is what our complete project file hierarchy looks like:
+
+```text
+portfolio-2026/
+├── app/
+│   ├── api/
+│   │   └── now-playing/
+│   │       └── route.ts     # The resilient data polling endpoint
+│   ├── lib/
+│   │   └── spotify.ts       # Server-only Spotify API wrapper
+│   └── page.tsx             # The frontend live widget
+├── components/
+│   └── ui/
+│       └── now-playing.tsx  # The visual status component
+├── .env.local               # Spotify Secrets
+└── next.config.ts
+```
+
+That sounds simple, but doing it properly means solving token refresh, null states, no-cache data, and safe server boundaries. This scrawl is the build log of that journey, written so you can ship your own version without the usual OAuth pain.
+
+## What This App Actually Does
+
+By the end of this build, we have:
+
+- A strict `server-only` Spotify data layer.
+- A resilient `/api/now-playing` endpoint.
+- A frontend that polls cleanly and never explodes on paused playback.
+- A live embeddable experience you can drop into your portfolio.
+
+## Environment Variables
+
+Use this `.env.local` baseline:
+
+```env
+SPOTIFY_CLIENT_ID=
+SPOTIFY_CLIENT_SECRET=
+SPOTIFY_REFRESH_TOKEN=
+NEXT_PUBLIC_NAME=Harshit
+```
+
+Optional fallback for temporary debugging:
+
+```env
+SPOTIFY_ACCESS_TOKEN=
+```
+
+## Core Spotify Module (Exact Pattern)
+
+This is the full `app/lib/spotify.ts` pattern used in the app:
+
+```ts
+import "server-only";
+
+const SPOTIFY_CURRENTLY_PLAYING_ENDPOINT =
+  "https://api.spotify.com/v1/me/player/currently-playing";
+
+export type CurrentPlayback = {
+  isPlaying: boolean;
+  progressMs: number;
+  timestampMs: number;
+  durationMs: number;
+  trackId: string;
+  trackName: string;
+  artists: string[];
+  albumName: string;
+  albumImageUrl: string | null;
+  spotifyUrl: string | null;
+};
+
+type SpotifyImage = {
+  url: string;
+  height: number | null;
+  width: number | null;
+};
+
+type SpotifyTrack = {
+  id: string;
+  name: string;
+  duration_ms: number;
+  artists: Array<{ name: string }>;
+  album: {
+    name: string;
+    images: SpotifyImage[];
+  };
+  external_urls?: {
+    spotify?: string;
+  };
+};
+
+type SpotifyCurrentlyPlayingResponse = {
+  is_playing: boolean;
+  progress_ms: number | null;
+  timestamp: number;
+  currently_playing_type: string;
+  item: SpotifyTrack | null;
+};
+
+const TOKEN_ENDPOINT = "https://accounts.spotify.com/api/token";
+
+async function getAccessToken() {
+  const client_id = process.env.SPOTIFY_CLIENT_ID;
+  const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
+  const refresh_token = process.env.SPOTIFY_REFRESH_TOKEN;
+
+  if (!client_id || !client_secret || !refresh_token) {
+    if (process.env.SPOTIFY_ACCESS_TOKEN) {
+      return process.env.SPOTIFY_ACCESS_TOKEN;
+    }
+    throw new Error("Missing Spotify credentials in env.");
+  }
+
+  const basic = Buffer.from(`${client_id}:${client_secret}`).toString("base64");
+
+  const response = await fetch(TOKEN_ENDPOINT, {
+    method: "POST",
+    headers: {
+      Authorization: `Basic ${basic}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: new URLSearchParams({
+      grant_type: "refresh_token",
+      refresh_token,
+    }),
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch Spotify access token");
+  }
+
+  const data = await response.json();
+  return data.access_token as string;
+}
+
+export async function getCurrentPlayingSong(): Promise<CurrentPlayback | null> {
+  const accessToken = await getAccessToken();
+
+  const response = await fetch(SPOTIFY_CURRENTLY_PLAYING_ENDPOINT, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    cache: "no-store",
+  });
+
+  if (response.status === 204) {
+    return null;
+  }
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(
+      `Spotify currently-playing request failed (${response.status}): ${body}`,
+    );
+  }
+
+  const payload =
+    (await response.json()) as SpotifyCurrentlyPlayingResponse | null;
+
+  if (!payload || payload.currently_playing_type !== "track" || !payload.item) {
+    return null;
+  }
+
+  const track = payload.item;
+
+  return {
+    isPlaying: payload.is_playing,
+    progressMs: payload.progress_ms ?? 0,
+    timestampMs: payload.timestamp,
+    durationMs: track.duration_ms,
+    trackId: track.id,
+    trackName: track.name,
+    artists: track.artists.map((artist) => artist.name),
+    albumName: track.album.name,
+    albumImageUrl: track.album.images[0]?.url ?? null,
+    spotifyUrl: track.external_urls?.spotify ?? null,
+  };
+}
+```
+
+## Real-Time API Route
+
+This is the route contract the client consumes. Notice how it keeps the response shape stable even when Spotify fails.
+
+```ts
+import { NextResponse } from "next/server";
+import { getCurrentPlayingSong } from "@/app/lib/spotify";
+
+export const dynamic = "force-dynamic";
+
+export async function GET() {
+  try {
+    const song = await getCurrentPlayingSong();
+
+    return NextResponse.json({ song });
+  } catch {
+    return NextResponse.json({ song: null }, { status: 500 });
+  }
+}
+```
+
+## Why This Endpoint Is Reliable
+
+- `force-dynamic` + `no-store` keeps data fresh for every request.
+- `204` maps to `null` cleanly, not an app crash.
+- Stable `{ song }` output keeps client logic dead simple.
+- Spotify outages degrade gracefully to `song: null`.
+
+## Client Polling Pattern
+
+```ts
+const pollNowPlaying = async () => {
+  const res = await fetch("/api/now-playing", { cache: "no-store" });
+  if (!res.ok) return;
+
+  const data = await res.json();
+  setSong(data.song);
+};
+
+pollNowPlaying();
+const int = setInterval(pollNowPlaying, 5000);
+
+return () => clearInterval(int);
+```
+
+## How To Get A Spotify Refresh Token (Without Guesswork)
+
+This is the step most builds die on. Keep this section open while you do it.
+
+### 1) Create Spotify App
+
+1. Go to Spotify Developer Dashboard.
+2. Create an app.
+3. Copy `Client ID` and `Client Secret`.
+4. Add a redirect URI exactly, for example `http://127.0.0.1:3000/callback`.
+
+### 2) Scopes You Need
+
+Use these scopes:
+
+- `user-read-currently-playing`
+- `user-read-playback-state`
+
+### 3) Build Authorization URL
+
+Replace placeholders and open this in the browser:
+
+```txt
+https://accounts.spotify.com/authorize?client_id=YOUR_CLIENT_ID&response_type=code&redirect_uri=http%3A%2F%2F127.0.0.1%3A3000%2Fcallback&scope=user-read-currently-playing%20user-read-playback-state
+```
+
+After approval, Spotify redirects to your callback with `?code=...`. Copy that `code` immediately.
+
+### 4) Exchange Code For Refresh Token
+
+Use curl and replace placeholders:
+
+```bash
+curl -X POST "https://accounts.spotify.com/api/token" \
+  -H "Authorization: Basic BASE64(CLIENT_ID:CLIENT_SECRET)" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=authorization_code&code=AUTH_CODE_FROM_CALLBACK&redirect_uri=http://127.0.0.1:3000/callback"
+```
+
+You should receive `refresh_token` and `access_token`. Save the refresh token securely.
+
+### 5) Put Secrets In Env
+
+```env
+SPOTIFY_CLIENT_ID=...
+SPOTIFY_CLIENT_SECRET=...
+SPOTIFY_REFRESH_TOKEN=...
+```
+
+## Production Notes That Matter
+
+- Never expose `CLIENT_SECRET` or `REFRESH_TOKEN` on client side.
+- Keep Spotify fetches server-only.
+- Return a stable JSON shape even on failure.
+- Avoid aggressive polling below `3s` unless you really need it.
+- Log error status + body for quick token debugging.
+
+If you only remember one thing from this post: treat Spotify credentials like database credentials, never browser credentials.
+
+## Shipping Checklist
+
+- Spotify app created with correct redirect URI.
+- Required scopes granted.
+- Refresh token captured and stored in deployment secrets.
+- `/api/now-playing` returns live payload locally.
+- Polling UI updates progress and handles paused state.
+- Embeds render cleanly across README and website.
+
+## Live Embed
+
+This is the deployed app running live:
+
+<WebsiteEmbed src="https://spotify-status-alpha.vercel.app/" title="Spotify Status Live" height={740} />
+
+I hope this scrawl saves you hours of frustration and gets your Spotify status live with confidence. The key is respecting the server boundary and handling every edge case gracefully. Happy coding!

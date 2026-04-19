@@ -1,0 +1,113 @@
+---
+title: "Building crunchy-api: A Modern TypeScript Client for Crunchyroll"
+smallTitle: "Building crunchy-api"
+date: "2026-04-19"
+excerpt: "How I reverse-engineered and built a fully-typed, robust Crunchyroll API client in TypeScript to fetch watch history, stream info, and more."
+tags: ["anime", "typescript", "api", "nextjs"]
+image: "https://static0.cbrimages.com/wordpress/wp-content/uploads/2020/11/Crunchyroll-Hime-.jpg"
+---
+
+I love anime—*Tokyo Ghoul*, *Attack on Titan*, *Fullmetal Alchemist: Brotherhood*. As a developer, naturally, I wanted to pull my watch history and currently watching lists into my own apps. The problem? Crunchyroll doesn't have a public, documented API for developers to easily play with. 
+
+So, I built one.
+
+## Enter `crunchy-api`
+
+I engineered **crunchy-api**, a fully-typed TypeScript client that seamlessly interacts with Crunchyroll's internal API. It handles token generation, session management, and parses enormous JSON payloads into strict, predictable TypeScript interfaces.
+
+Here’s how you can use it to pull your own data.
+
+## 1. The Core Client
+
+The foundation of the package is the `CrunchyrollClient`. It's designed to run beautifully in Node.js, edge runtimes, or Next.js React Server Components.
+
+```ts
+import { CrunchyrollClient } from "crunchy-api";
+
+const client = new CrunchyrollClient({
+  locale: "en-US",
+  timeoutMs: 15000,
+});
+```
+
+## 2. Authentication Contexts
+
+Crunchyroll has a few ways to authenticate. For public data (like fetching season episodes), you can just grab an anonymous token:
+
+```ts
+// 1. Get an anonymous token for public catalog browsing
+const anonToken = await client.getAnonymousToken();
+console.log("Token:", anonToken.access_token);
+```
+
+To access your personal Watch History or custom Crunchylists, you need to use your refresh token cookie (`etp_rt`). 
+
+```ts
+// 2. Authenticate using your browser cookie
+const session = await client.authenticateWithRtCookie({
+  cookie: process.env.CRUNCHYROLL_COOKIE,
+  deviceType: "Chrome on Android"
+});
+```
+
+The client handles the heavy lifting of hitting the underlying OAuth endpoints, resolving profiles, and managing the active session automatically.
+
+## 3. Pulling Your Anime Data
+
+Once authenticated, fetching data is as simple as calling a typed method. Under the hood, I've mapped out complex objects (like `CrunchyItem`, `EpisodeInfo`, and `WatchHistoryEntry`) so you get perfect intellisense and avoid parsing errors.
+
+```ts
+// Fetch what you are currently watching
+const currentlyWatching = await client.getCurrentlyWatching({
+  page_size: 10
+});
+
+// Or fetch your custom Crunchylists
+const lists = await client.getCrunchylists();
+
+// Get specific list items
+if (lists.data.length > 0) {
+  const items = await client.getCrunchylistItems(lists.data[0].id);
+  console.log(items.data);
+}
+```
+
+Wait, before we even authenticate, you can totally fetch public catalog data globally.
+
+Let's fetch season episodes of Wistoria S2 anonymously, directly pulling info using `client.getSeasonEpisodes(seasonId)` inside this Next.js server component:
+
+<CrunchySeason />
+
+You can also snag a dedicated episode instance, leveraging `client.getEpisodeInfo(episodeId)` just like this:
+
+<CrunchyEpisode />
+
+And here is another live demo connecting securely and dumping my personal Crunchylist dynamically inside this blog content!
+
+<CrunchyLists />
+
+## Building a Next.js Integration Harness
+
+To prove out the package, I built a Next.js integration harness that runs on the server and invokes each package method. This ensures that features like `force-dynamic` API routes and React Server Components play nicely with the `crunchy-api` fetch implementations.
+
+Because the returned data can be nested (e.g., episode info is sometimes wrapped in a `panel` object, and image arrays are deeply nested), I built a robust normalizer component:
+
+```tsx
+function getImageUrl(images: any): string | null {
+  const sources = images.thumbnail || images.poster_wide || images.poster_tall;
+  if (Array.isArray(sources) && sources.length > 0 && Array.isArray(sources[0])) {
+    const list = sources[0];
+    const item = list.length > 3 ? list[3] : list[list.length - 1];
+    return item?.source || null;
+  }
+  return null;
+}
+```
+
+If you're building an anime tracker, Discord bot, or a Next.js portfolio widget that brags about what you’re currently watching, `crunchy-api` handles all the session management and TypeScript generics for you out of the box. 
+
+Here is a live demo pulling my *actual* watch history right now, rendered natively in MDX using Server Components:
+
+<CrunchyStatus />
+
+Grab the package from NPM or check out the source on my GitHub. Now, back to watching *AOT*.

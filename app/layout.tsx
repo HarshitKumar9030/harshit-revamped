@@ -14,8 +14,19 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Harshit - Creative Developer",
-  description: "Portfolio of Harshit, a modern web developer.",
+  title: "Harshit",
+  description: "I design and engineer interactive web, software, and AI projects with a focus on clarity, performance, and meaningful user experience.",
+  openGraph: {
+    title: "Harshit",
+    description: "I design and engineer interactive web, software, and AI projects with a focus on clarity, performance, and meaningful user experience.",
+    images: [{ url: "/ogimagep.png" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Harshit",
+    description: "I design and engineer interactive web, software, and AI projects with a focus on clarity, performance, and meaningful user experience.",
+    images: ["/ogimagep.png"],
+  },
 };
 
 export default function RootLayout({

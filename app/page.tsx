@@ -10,13 +10,11 @@ import { Contact } from "@/components/sections/contact";
 import { Footer } from "@/components/sections/footer";
 import { Navbar } from "@/components/ui/navbar";
 import { Marquee } from "@/components/ui/marquee";
-import { ScrollAudio } from "@/components/ui/scroll-audio";
 
 export default function Home() {
   return (
     <>
       <Navbar />
-      <ScrollAudio />
       <main className="relative w-full overflow-x-hidden bg-[#F0EDE5]">
         <Hero />
         <About />

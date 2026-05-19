@@ -5,14 +5,30 @@ import Image from "next/image";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { Navbar } from "@/components/ui/navbar";
 import { Footer } from "@/components/sections/footer";
+import { Metadata } from "next";
 
 interface TagPageProps {
   params: Promise<{ tag: string }>;
 }
 
-export async function generateMetadata({ params }: TagPageProps) {
+export async function generateMetadata({ params }: TagPageProps): Promise<Metadata> {
   const { tag } = await params;
-  return { title: `Tags: ${tag.toUpperCase()} | Scrawl` };
+  const decodedTag = decodeURIComponent(tag).toUpperCase();
+  return { 
+    title: `${decodedTag} Scrawls`,
+    description: `Read technical notes and writings categorized under ${decodedTag}.`,
+    openGraph: {
+      title: `${decodedTag} Scrawls`,
+      description: `Read technical notes and writings categorized under ${decodedTag}.`,
+      images: [{ url: "/ogimagep.png" }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${decodedTag} Scrawls`,
+      description: `Read technical notes and writings categorized under ${decodedTag}.`,
+      images: ["/ogimagep.png"],
+    }
+  };
 }
 
 export async function generateStaticParams() {

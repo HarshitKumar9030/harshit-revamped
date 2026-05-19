@@ -4,10 +4,22 @@ import { Navbar } from "@/components/ui/navbar";
 import { Footer } from "@/components/sections/footer";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 import { ScrawlSearch } from "./ScrawlSearch";
+import { Metadata } from "next";
 
-export const metadata = {
-  title: "All Scrawls | Harshit",
-  description: "Browse all writings and notes.",
+export const metadata: Metadata = {
+  title: "All Scrawls",
+  description: "Browse all writings, technical notes, and observations.",
+  openGraph: {
+    title: "All Scrawls",
+    description: "Browse all writings, technical notes, and observations.",
+    images: [{ url: "/ogimagep.png" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "All Scrawls",
+    description: "Browse all writings, technical notes, and observations.",
+    images: ["/ogimagep.png"],
+  },
 };
 
 export default async function AllScrawlsIndex() {

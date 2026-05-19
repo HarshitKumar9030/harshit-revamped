@@ -4,10 +4,22 @@ import { getAllScrawls } from "@/lib/mdx";
 import { Navbar } from "@/components/ui/navbar";
 import { Footer } from "@/components/sections/footer";
 import { ArrowUpRight, ArrowRight } from "lucide-react";
+import { Metadata } from "next";
 
-export const metadata = {
-  title: "Scrawl | Harshit",
-  description: "Writings and notes on interactive web applications.",
+export const metadata: Metadata = {
+  title: "Scrawl",
+  description: "Writings and notes on interactive web applications, AI, and software engineering.",
+  openGraph: {
+    title: "Scrawl",
+    description: "Writings and notes on interactive web applications, AI, and software engineering.",
+    images: [{ url: "/ogimagep.png" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Scrawl",
+    description: "Writings and notes on interactive web applications, AI, and software engineering.",
+    images: ["/ogimagep.png"],
+  },
 };
 
 const getPlaceholderImage = (i: number) => {

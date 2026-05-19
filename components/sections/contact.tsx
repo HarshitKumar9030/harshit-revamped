@@ -22,11 +22,11 @@ export function Contact() {
           <div className="flex flex-col gap-2">
             <span className="uppercase text-xs font-bold tracking-[0.2em] opacity-50">Drop a Line</span>
             <a 
-              href="mailto:hey@harshitsingh.net" 
+              href="mailto:hey@harshit.page" 
               className="text-4xl md:text-7xl font-bold tracking-tighter text-[#2A2A2A] hover:text-[#9A8CFF] transition-colors duration-300"
               style={{ fontFamily: "var(--font-heading)" }}
             >
-              hey@harshitsingh.net
+              hey@harshit.page
             </a>
           </div>
         </div>

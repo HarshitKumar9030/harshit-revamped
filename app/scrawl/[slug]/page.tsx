@@ -13,16 +13,34 @@ import { ViewTracker } from "@/components/ui/view-tracker";
 import { mdxComponents } from "@/components/ui/mdx-components";
 // Load Katex stylesheet globally for math styling, but local to this route
 import "katex/dist/katex.min.css"; 
+import { Metadata } from "next";
 
 interface ScrawlPageProps {
   params: Promise<{ slug: string }>;
 }
 
-export async function generateMetadata({ params } : ScrawlPageProps) {
+export async function generateMetadata({ params } : ScrawlPageProps): Promise<Metadata> {
   const { slug } = await params;
   try {
     const { meta } = await getScrawlBySlug(slug);
-    return { title: `${meta.title} | Scrawl` };
+    return { 
+      title: `${meta.title} | Scrawl`,
+      description: meta.excerpt,
+      openGraph: {
+        title: meta.title,
+        description: meta.excerpt,
+        type: 'article',
+        publishedTime: meta.date,
+        tags: meta.tags,
+        images: meta.image ? [{ url: meta.image }] : [{ url: "/ogimagep.png" }],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: meta.title,
+        description: meta.excerpt,
+        images: meta.image ? [meta.image] : ["/ogimagep.png"],
+      }
+    };
   } catch (error) {
     return { title: '404 - Scrawl Not Found' };
   }

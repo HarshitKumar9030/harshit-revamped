@@ -5,10 +5,22 @@ import { Footer } from "@/components/sections/footer";
 import { getAllScrawls } from "@/lib/mdx";
 import { connectToDatabase } from "@/lib/mongodb";
 import { TagMetric } from "@/lib/models";
+import { Metadata } from "next";
 
-export const metadata = {
-  title: "Scrawl Tags | Harshit",
-  description: "Browse our scrawls by tag.",
+export const metadata: Metadata = {
+  title: "Scrawl Tags",
+  description: "Browse writings and notes by topics.",
+  openGraph: {
+    title: "Scrawl Tags",
+    description: "Browse writings and notes by topics.",
+    images: [{ url: "/ogimagep.png" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Scrawl Tags",
+    description: "Browse writings and notes by topics.",
+    images: ["/ogimagep.png"],
+  },
 };
 
 export default async function TagsIndex() {

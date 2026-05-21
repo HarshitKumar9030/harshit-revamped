@@ -10,10 +10,12 @@ import { Contact } from "@/components/sections/contact";
 import { Footer } from "@/components/sections/footer";
 import { Navbar } from "@/components/ui/navbar";
 import { Marquee } from "@/components/ui/marquee";
+import { HelloLoader } from "@/components/ui/hello-loader";
 
 export default function Home() {
   return (
     <>
+      <HelloLoader />
       <Navbar />
       <main className="relative w-full overflow-x-hidden bg-[#F0EDE5]">
         <Hero />

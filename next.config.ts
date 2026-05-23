@@ -37,6 +37,14 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: "/api/collect",
+        destination: "https://metrics.harshit.page/api/collect",
+      },
+    ];
+  },
 };
 
 export default nextConfig;

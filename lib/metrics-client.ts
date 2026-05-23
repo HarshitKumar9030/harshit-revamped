@@ -13,7 +13,7 @@ export async function getMetricsClient() {
     // Prefer public env override, fallback to the example ingestion endpoint
     const endpoint = typeof window !== "undefined" && process?.env?.NEXT_PUBLIC_METRICS_ENDPOINT
       ? process.env.NEXT_PUBLIC_METRICS_ENDPOINT
-      : "https://metrics.harshit.page/api/collect";
+      : "/api/collect";
 
     const apiKey = process?.env?.NEXT_PUBLIC_HARSHIT_METRICS_KEY || "mtr_your_api_key";
 

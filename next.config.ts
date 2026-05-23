@@ -40,7 +40,7 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: "/api/collect",
+        source: "/api/system-sync",
         destination: "https://metrics.harshit.page/api/collect",
       },
     ];

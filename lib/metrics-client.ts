@@ -13,9 +13,9 @@ export async function getMetricsClient() {
     // Prefer public env override, fallback to the example ingestion endpoint
     const endpoint = typeof window !== "undefined" && process?.env?.NEXT_PUBLIC_METRICS_ENDPOINT
       ? process.env.NEXT_PUBLIC_METRICS_ENDPOINT
-      : "/api/collect";
+      : "/api/system-sync";
 
-    const apiKey = process?.env?.NEXT_PUBLIC_HARSHIT_METRICS_KEY || "mtr_your_api_key";
+    const apiKey = process?.env?.NEXT_PUBLIC_HARSHIT_METRICS_KEY || "mtr_3b7b8c42d160d2e24b10ff80fa3f41b01a9e7823dcc220e8";
 
     _client = createMetricsClient(apiKey, {
       endpoint,

@@ -29,6 +29,25 @@ export async function POST(req: Request) {
         );
       }
     }
+
+    // Optionally forward to external ingestion endpoint when configured
+    try {
+      const endpoint = process.env.HARSHIT_METRICS_ENDPOINT || process.env.NEXT_PUBLIC_METRICS_ENDPOINT || "https://metrics.harshit.page/api/collect";
+      const apiKey = process.env.HARSHIT_METRICS_KEY;
+      if (endpoint && apiKey) {
+        // fire-and-forget
+        fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${apiKey}`,
+          },
+          body: JSON.stringify({ event: "scrawl_view", properties: { slug, tags } }),
+        }).catch(() => {});
+      }
+    } catch (e) {
+      // ignore forwarding errors
+    }
     
     return NextResponse.json({ success: true, views: postMetric.views });
   } catch (error: any) {

@@ -26,6 +26,16 @@ export async function getMetricsClient() {
       retryBackoffMs: 2000,
       persistQueue: true,
       storageKey: "harshit_metrics_queue",
+      autoTrackClicks: true,
+      autoTrackOutbound: true,
+      autoTrackForms: true,
+      autoTrackScrollDepth: true,
+      autoTrackErrors: true,
+      autoTrackWebVitals: true,
+      autoTrackRouteChanges: true,
+      captureUtmParams: true,
+      enrichDeviceInfo: true,
+      debug: process.env.NODE_ENV === "development",
     });
 
     if (typeof window !== "undefined") {
@@ -44,7 +54,15 @@ export async function getMetricsClient() {
       trackPageview: async () => {},
       identify: async () => {},
       setContext: async () => {},
+      clearContext: async () => {},
+      setUserProperties: async () => {},
+      clearUserProperties: async () => {},
+      group: async () => {},
+      startTimer: () => 0,
       trackTiming: async () => {},
+      trackRevenue: async () => {},
+      trackFeatureFlag: async () => {},
+      trackEngagement: () => () => {},
       flush: async () => {},
       shutdown: async () => {},
     };

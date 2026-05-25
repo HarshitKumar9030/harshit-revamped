@@ -3,11 +3,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useLenis } from "lenis/react";
 import { useState, useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { HamburgerIcon, LineStyleIcon, Menu, Waves, X } from "lucide-react";
 
 export function Navbar() {
   const lenis = useLenis();
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     if (isOpen) {
@@ -20,20 +22,32 @@ export function Navbar() {
     };
   }, [isOpen]);
 
-  const handleScroll = (id: string) => (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsOpen(false);
-    if (lenis) {
-      lenis.scrollTo(id, { offset: 0 });
-    } else {
-      document.querySelector(id)?.scrollIntoView({ behavior: "smooth" });
+  const handleLinkClick = (href: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (href.startsWith("/#")) {
+      const isHome = pathname === "/";
+      if (isHome) {
+        e.preventDefault();
+        setIsOpen(false);
+        const hash = href.substring(1);
+        if (lenis) {
+          lenis.scrollTo(hash, { offset: 0 });
+        } else {
+          document.querySelector(hash)?.scrollIntoView({ behavior: "smooth" });
+        }
+      } else {
+        // Just let it navigate to /#work normally
+        setIsOpen(false);
+      }
+      return;
     }
+
+    setIsOpen(false);
   };
 
   const navLinks = [
-    { name: "Work", href: "#work" },
-    { name: "About", href: "#about" },
-    { name: "Contact", href: "#contact" }
+    { name: "Work", href: "/#work" },
+    { name: "About", href: "/#about" },
+    { name: "Experiments", href: "/experiments" }
   ];
 
   return (
@@ -55,10 +69,10 @@ export function Navbar() {
         
         <nav className="hidden md:flex gap-10 items-center text-sm font-medium tracking-[0.2em] uppercase" style={{ fontFamily: "var(--font-heading)" }}>
           {navLinks.map((link) => (
-            <a 
+            <Link 
               key={link.name} 
               href={link.href} 
-              onClick={handleScroll(link.href)} 
+              onClick={handleLinkClick(link.href)} 
               className="relative group overflow-hidden cursor-pointer"
             >
               <span className="inline-block transition-transform duration-300 group-hover:-translate-y-full">
@@ -67,7 +81,7 @@ export function Navbar() {
               <span className="absolute top-0 left-0 inline-block transition-transform duration-300 translate-y-full group-hover:translate-y-0 text-[#D9ED92]">
                 {link.name}
               </span>
-            </a>
+            </Link>
           ))}
           <Link 
             href="/scrawl" 
@@ -112,14 +126,14 @@ export function Navbar() {
                   exit={{ opacity: 0, y: 20 }}
                   transition={{ delay: 0.1 + i * 0.1, duration: 0.5, ease: "easeOut" }}
                 >
-                  <a
+                  <Link
                     href={link.href}
-                    onClick={handleScroll(link.href)}
+                    onClick={handleLinkClick(link.href)}
                     className="text-6xl md:text-7xl font-black tracking-tighter uppercase transition-colors hover:text-[#D9ED92] hover:italic"
                     style={{ fontFamily: "var(--font-heading)" }}
                   >
                     {link.name}
-                  </a>
+                  </Link>
                 </motion.div>
               ))}
               <motion.div

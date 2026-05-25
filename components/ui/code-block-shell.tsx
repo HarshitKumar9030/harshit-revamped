@@ -12,8 +12,9 @@ export function CodeBlockShell({ children }: CodeBlockShellProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  async function handleCopy() {
-    const code = contentRef.current?.querySelector("code")?.textContent ?? "";
+  async function handleCopy(e: React.MouseEvent) {
+    if (e) e.stopPropagation();
+    const code = contentRef.current?.querySelector("code")?.textContent ?? contentRef.current?.textContent ?? "";
     if (!code) return;
 
     try {
@@ -26,7 +27,10 @@ export function CodeBlockShell({ children }: CodeBlockShellProps) {
   }
 
   return (
-    <div className="relative my-12 w-full max-w-[85ch] overflow-hidden rounded-[2.5rem] bg-[#111111] text-[#FDFBF7] shadow-lg">
+    <div 
+      className="relative my-12 w-full max-w-[85ch] overflow-hidden rounded-[2.5rem] bg-[#111111] text-[#FDFBF7] shadow-lg cursor-pointer transition-all duration-300"
+      onClick={() => setIsExpanded(prev => !prev)}
+    >
       <div className="flex items-center justify-between border-b border-[#FDFBF7]/10 px-5 py-4">
         <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#FDFBF7]/55">Code</span>
         <div className="flex items-center gap-2">
@@ -37,29 +41,26 @@ export function CodeBlockShell({ children }: CodeBlockShellProps) {
             aria-label="Copy code"
           >
             {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-            {copied ? "Copied" : "Copy"}
+            <span className="mt-0.5">{copied ? "Copied" : "Copy"}</span>
           </button>
-          <button
-            type="button"
-            onClick={() => setIsExpanded((prev) => !prev)}
-            className="flex items-center gap-1 rounded-full bg-[#FDFBF7]/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] transition-colors hover:bg-[#DBC2FC] hover:text-[#111111]"
-            aria-label={isExpanded ? "Collapse code" : "Expand code"}
-          >
-            {isExpanded ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
-            {isExpanded ? "Contract" : "Expand"}
-          </button>
+          
+          {/* <div className="flex items-center gap-1 rounded-full bg-[#111111] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#FDFBF7]/80 border border-[#FDFBF7]/20 pointer-events-none">
+            TypeScript
+          </div> */}
         </div>
       </div>
 
       <div className="relative">
         <div
           ref={contentRef}
-          className={isExpanded ? "max-h-none overflow-auto p-6" : "max-h-[24rem] overflow-auto p-6"}
+          className={isExpanded ? "max-h-none overflow-auto p-6" : "max-h-[24rem] overflow-hidden p-6"}
         >
           {children}
         </div>
         {!isExpanded && (
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#111111] to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#111111] to-transparent flex items-end justify-center pb-4">
+            <span className="text-[#FDFBF7]/40 text-[10px] uppercase tracking-[0.2em] font-bold">Tap to expand</span>
+          </div>
         )}
       </div>
     </div>

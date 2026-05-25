@@ -32,7 +32,7 @@ export default async function ExperimentsIndex() {
   return (
     <>
       <Navbar />
-      <div className="w-full min-h-screen bg-[#FDFBF7] text-[#111111] selection:bg-[#D9ED92] selection:text-[#111111] flex flex-col pt-32 px-4 md:px-12 relative overflow-hidden font-sans">
+      <div className="w-full min-h-screen bg-[#FDFBF7] text-[#111111] selection:bg-[#D9ED92] selection:text-[#111111] flex flex-col pt-32 px-4 md:px-12 relative overflow-clip font-sans">
         
         <main className="max-w-[1400px] w-full mx-auto relative z-10 flex flex-col md:flex-row gap-16 pb-32">
           

@@ -5,6 +5,8 @@ import { Quote, ArrowRightIcon, Grip } from "lucide-react";
 import { AudioPlayer } from "@/components/ui/audio-player";
 import { CodeBlockShell } from "@/components/ui/code-block-shell";
 import { WebsiteEmbed } from "@/components/ui/website-embed";
+import { ExpandableImage } from "@/components/ui/expandable-image";
+import { PullQuote } from "@/components/ui/pull-quote";
 import { CrunchyStatus } from "@/components/sections/crunchy";
 import { CrunchyLists } from "@/components/sections/crunchy-lists";
 import { CrunchyEpisode } from "@/components/sections/crunchy-episode";
@@ -34,6 +36,7 @@ export const mdxComponents: MDXRemoteProps["components"] = {
   CrunchyLists,
   CrunchyEpisode,
   CrunchySeason,
+  PullQuote,
   h1: (props) => (
     <h1
       className="text-6xl md:text-8xl font-black mt-24 mb-10 tracking-tighter uppercase leading-[0.9] text-transparent"
@@ -117,20 +120,5 @@ export const mdxComponents: MDXRemoteProps["components"] = {
       />
     );
   },
-  img: (props: any) => (
-    <div className="w-full my-16 relative aspect-21/9 bg-[#EAE5D9] overflow-hidden group rounded-[2.5rem]">
-      <Image 
-        src={props.src} 
-        alt={props.alt || "Scrawl Image"} 
-        fill 
-        sizes="(max-width: 768px) 100vw, 85ch"
-        className="object-cover grayscale-[0.2] mix-blend-multiply group-hover:mix-blend-normal group-hover:grayscale-0 group-hover:scale-105 transition-all duration-2000"
-      />
-      {props.alt && (
-        <span className="absolute bottom-6 right-6 z-20 text-[10px] uppercase font-bold tracking-[0.2em] text-[#111111] bg-[#FDFBF7]/90 backdrop-blur-md px-4 py-2 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-700">
-          {props.alt}
-        </span>
-      )}
-    </div>
-  ),
+  img: (props: any) => <ExpandableImage src={props.src} alt={props.alt} />,
 };

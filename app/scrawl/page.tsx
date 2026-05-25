@@ -84,8 +84,8 @@ export default async function ScrawlIndex() {
                         <span className="w-[1px] h-3 bg-[#111]/20"></span>
                         <span>{new Date(scrawl.date).toLocaleDateString('en-US', { day: '2-digit', month: 'short' })}</span>
                        </div>
-                       <h2 className="text-3xl md:text-[2.75rem] font-black uppercase tracking-tighter leading-[0.9] text-[#111111]" style={{ fontFamily: 'var(--font-heading)' }}>
-                         {scrawl.title}
+                       <h2 className="text-3xl md:text-[2.75rem] p-1 font-black uppercase tracking-tighter leading-[0.9] text-[#111111]" style={{ fontFamily: 'var(--font-heading)' }}>
+                         {scrawl.title} 
                        </h2>
                     </div>
                   </Link>

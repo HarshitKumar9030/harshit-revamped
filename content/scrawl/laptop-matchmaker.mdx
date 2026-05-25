@@ -1,0 +1,81 @@
+---
+title: "Laptop Matchmaker: A Better First Screen for Buying Laptops"
+smallTitle: "Laptop Matchmaker"
+date: "2026-05-25"
+excerpt: "A closer look at the two-step laptop buying flow, the pink-and-violet interface, and the product thinking behind a small but serious recommendation tool."
+tags: ["nextjs", "ux", "product-design", "ai"]
+image: "/scrawls/laptops-ogimage.png"
+---
+
+You know what's entirely broken? Buying a laptop. You start out looking for something "good for college and maybe some Netflix" and somehow end up on page three of a forum reading heated arguments about thermal throttling and hinge tension. 
+
+The first thing that makes **Laptop Matchmaker** feel different is that it behaves like a focused tool, not a generic search bar. It opens with a blunt promise: **find your perfect laptop within your budget**. 
+
+Most laptop-buying tools bury you in dropdowns and spec comparison tables before you even know what you're looking for. This one? It starts by narrowing the problem down and actually makes the conversation feel human.
+
+## Just tell me what you want to spend
+
+The landing screen uses a two-step pattern that is instantly understandable:
+
+- **Step 1:** The essentials. Budget and country.
+- **Step 2:** The details. What are you actually going to use it for? Do you absolutely need a Mac? Are you a student?
+
+This structure mirrors how people *actually* shop. You always start with "How much can I afford?" The rest of the details only matter after we've established the constraints.
+
+## The live experience
+
+The homepage is dead simple on purpose: a strong title, one clear prompt, and a card that moves you forward without any friction at all.
+
+![Laptop Matchmaker homepage](/scrawls/homepage.png)
+
+## Why the interface works
+
+Visually, the page leans into a super deliberate pink, violet, and cream palette. The large type, thick borders, and sharp shadows make the app feel a bit editorial instead of looking like a sterile Best Buy clone. It has the energy of a poster, but the behavior of a utility.
+
+<PullQuote quote="It has the energy of a poster, but the behavior of a utility." />
+
+A few things stand out to me immediately:
+
+- The oversized title on the left
+- The card-based form on the right
+- The neon-accented step label
+- The massive amount of whitespace letting it all breathe
+
+That balance is super important. The interface looks expressive, but it never gets in the way of what you're actually trying to do.
+
+## The BYOK layer is a smart fallback
+
+Oh, and the API settings screen introduces a "Bring Your Own Key" (BYOK) path and a custom model selector. That is exactly the kind of feature that turns a weekend prototype into a genuinely usable product.
+
+Instead of relying on one shared API key until it gets rate-limited to oblivion, the app hands control back to you. 
+
+<PullQuote quote="Give me your constraints first, and I will do the hard part." by="Laptop Matchmaker" />
+
+At the end of the day, a good assistant should take your fuzzy constraints, organize the search space, and return a recommendation you can honestly trust. That's what makes this thing actually useful.
+
+![BYOK and model settings](/scrawls/byok.png)
+
+The model dropdown also signals maturity. It tells me this app is not just trying to answer one prompt. It is designed to let the user choose their level of speed, quality, and cost.
+
+## A live embed of the product
+
+<WebsiteEmbed src="https://laptops.harshit.page" title="Laptop Matchmaker Live" height={760} />
+
+## What makes it feel polished
+
+The strongest part of the build is the restraint.
+
+The app could have tried to look like a full marketplace, but it does not. It stays focused on the first decision a buyer needs to make: what even counts as a good option for them?
+
+That focus shows up in the flow, the typography, and the copy. The whole experience says:
+
+<PullQuote quote="Give me your constraints first, and I will do the hard part." />
+
+## The bigger product story
+
+What I like most about this project is that it feels like a real answer to an annoying problem. Buying a laptop should not require bouncing between tabs, filters, reviews, and vague recommendations. A good assistant should take the constraints, organize the search, and return something a person can actually compare.
+
+That is what makes **Laptop Matchmaker** feel useful. It is not just AI for AI's sake. It is a narrow tool with a clear job, and the design reflects that discipline.
+
+<PullQuote quote="Laptop Matchmaker is a small, sharp buying assistant that turns laptop discovery into a guided decision instead of a messy search." by="Product thesis" />
+

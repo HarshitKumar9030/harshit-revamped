@@ -2,23 +2,24 @@ import { Metadata } from "next";
 import { Navbar } from "@/components/ui/navbar";
 import { Footer } from "@/components/sections/footer";
 import { GooeyMask } from "@/components/experiments/gooey-mask";
+import { SmoothTextMorph } from "@/components/experiments/smooth-text-morph";
 import { LaptopFrame } from "@/components/ui/laptop-frame";
 import { CodeBlockShell } from "@/components/ui/code-block-shell";
-import { gooeyMaskCode } from "@/constants/experiments-code";
+import { gooeyMaskCode, smoothTextMorphCode } from "@/constants/experiments-code";
 import { codeToHtml } from "shiki";
 
 export const metadata: Metadata = {
-  title: "Experiments",
-  description: "A collection of interactive components and visual experiments.",
+  title: "Experiments | Harshit's Scrawl & Web Components",
+  description: "A scratchpad of interactive animations, spring physics, React components, and creative developer experiments.",
   openGraph: {
-    title: "Experiments",
-    description: "A collection of interactive components and visual experiments.",
+    title: "Experiments | Harshit",
+    description: "A scratchpad of interactive animations, spring physics, React components, and creative developer experiments.",
     images: [{ url: "/ogimagep.png" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Experiments",
-    description: "A collection of interactive components and visual experiments.",
+    title: "Experiments | Harshit",
+    description: "A scratchpad of interactive animations, spring physics, React components, and creative developer experiments.",
     images: ["/ogimagep.png"],
   },
 };
@@ -27,6 +28,11 @@ export default async function ExperimentsIndex() {
   const gooeyMaskHighlighted = await codeToHtml(gooeyMaskCode, {
     lang: "tsx",
     theme: "github-dark-dimmed", // or whatever dark theme fits best
+  });
+
+  const smoothTextMorphHighlighted = await codeToHtml(smoothTextMorphCode, {
+    lang: "tsx",
+    theme: "github-dark-dimmed",
   });
 
   return (
@@ -51,6 +57,10 @@ export default async function ExperimentsIndex() {
               <a href="#exp-01" className="text-lg font-medium hover:italic transition-all flex items-center gap-4 group">
                 <span className="text-xs font-mono text-[#111111]/40 group-hover:text-[#111111]">01</span>
                 <span>Gooey Mask</span>
+              </a>
+              <a href="#exp-02" className="text-lg font-medium hover:italic transition-all flex items-center gap-4 group">
+                <span className="text-xs font-mono text-[#111111]/40 group-hover:text-[#111111]">02</span>
+                <span>Smooth Text Morph</span>
               </a>
               {/* Add more links here later */}
             </nav>
@@ -83,6 +93,29 @@ export default async function ExperimentsIndex() {
                     <div 
                       className="text-[13px] leading-relaxed relative z-20 font-mono [&>pre]:!bg-transparent [&>pre]:!m-0 [&>pre]:!p-0"
                       dangerouslySetInnerHTML={{ __html: gooeyMaskHighlighted }}
+                    />
+                  </CodeBlockShell>
+                </div>
+              </div>
+            </div>
+
+            {/* Experiment 02: Smooth Text Morph */}
+            <div id="exp-02" className="flex flex-col gap-8 scroll-mt-32">
+              <LaptopFrame>
+                <SmoothTextMorph />
+              </LaptopFrame>
+
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-start gap-8 px-4 max-w-[1000px] mx-auto w-full">
+                <div>
+                  <h2 className="text-3xl font-black tracking-tight" style={{ fontFamily: 'var(--font-heading)' }}>Smooth Text Morph</h2>
+                  <p className="text-[#111111]/70 mt-2 text-lg max-w-[30ch]">A critically damped, scattered spring physics text morpher.</p>
+                </div>
+                
+                <div className="w-full md:w-[600px] -mt-12 -ml-0 md:-ml-8">
+                  <CodeBlockShell>
+                    <div 
+                      className="text-[13px] leading-relaxed relative z-20 font-mono [&>pre]:!bg-transparent [&>pre]:!m-0 [&>pre]:!p-0"
+                      dangerouslySetInnerHTML={{ __html: smoothTextMorphHighlighted }}
                     />
                   </CodeBlockShell>
                 </div>

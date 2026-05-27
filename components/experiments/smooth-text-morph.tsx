@@ -47,7 +47,7 @@ export function SmoothTextMorph({
 
   return (
     <div 
-      className="relative flex h-full w-full cursor-pointer items-center justify-center overflow-hidden bg-[#121212] font-['Plus_Jakarta_Sans',sans-serif] antialiased"
+      className="relative flex h-full w-full cursor-pointer items-center justify-center overflow-hidden bg-[#121212]  antialiased"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => setIsHovered(!isHovered)}
@@ -60,7 +60,7 @@ export function SmoothTextMorph({
           return (
             <motion.span
               key={item.id}
-              className="inline-block origin-center text-4xl md:text-6xl font-extrabold text-white tracking-[4px] will-change-transform"
+              className="inline-block origin-center text-4xl md:text-6xl font-semibold text-white tracking-[4px] will-change-transform"
               initial={false}
               animate={
                 isHovered
@@ -109,7 +109,7 @@ export function SmoothTextMorph({
       </div>
 
       <motion.div
-        className="pointer-events-none absolute bottom-10 text-xs font-extrabold uppercase tracking-[2px] text-zinc-600"
+        className="pointer-events-none absolute bottom-10 text-xs font-bold uppercase tracking-[2px] text-zinc-600"
         animate={{ opacity: isHovered ? 0 : 1 }}
         transition={{ duration: 0.4, ease: "easeInOut" }}
       >

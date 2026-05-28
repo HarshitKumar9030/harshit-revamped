@@ -196,7 +196,7 @@ export default function AmbientDeck() {
         })}
 
         {/* Minimalist modern hint */}
-        <div className="absolute -bottom-[70px] left-1/2 -translate-x-1/2 flex items-center gap-2 text-[rgba(255,255,255,0.4)] text-[0.85rem] font-medium tracking-[0.02em]">
+        <div className="absolute -bottom-[50px] left-1/2 -translate-x-1/2 flex items-center gap-2 text-[rgba(255,255,255,0.4)] text-[0.85rem] font-medium tracking-[0.02em]">
           <span>Swipe to explore</span>
         </div>
       </div>

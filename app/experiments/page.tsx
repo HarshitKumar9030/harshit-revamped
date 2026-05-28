@@ -3,9 +3,10 @@ import { Navbar } from "@/components/ui/navbar";
 import { Footer } from "@/components/sections/footer";
 import { GooeyMask } from "@/components/experiments/gooey-mask";
 import { SmoothTextMorph } from "@/components/experiments/smooth-text-morph";
+import AmbientDeck from "@/components/experiments/ambient-deck";
 import { LaptopFrame } from "@/components/ui/laptop-frame";
 import { CodeBlockShell } from "@/components/ui/code-block-shell";
-import { gooeyMaskCode, smoothTextMorphCode } from "@/constants/experiments-code";
+import { gooeyMaskCode, smoothTextMorphCode, ambientDeckCode } from "@/constants/experiments-code";
 import { codeToHtml } from "shiki";
 
 export const metadata: Metadata = {
@@ -31,6 +32,11 @@ export default async function ExperimentsIndex() {
   });
 
   const smoothTextMorphHighlighted = await codeToHtml(smoothTextMorphCode, {
+    lang: "tsx",
+    theme: "github-dark-dimmed",
+  });
+
+  const ambientDeckHighlighted = await codeToHtml(ambientDeckCode || "", {
     lang: "tsx",
     theme: "github-dark-dimmed",
   });
@@ -61,6 +67,10 @@ export default async function ExperimentsIndex() {
               <a href="#exp-02" className="text-lg font-medium hover:italic transition-all flex items-center gap-4 group">
                 <span className="text-xs font-mono text-[#111111]/40 group-hover:text-[#111111]">02</span>
                 <span>Smooth Text Morph</span>
+              </a>
+              <a href="#exp-03" className="text-lg font-medium hover:italic transition-all flex items-center gap-4 group">
+                <span className="text-xs font-mono text-[#111111]/40 group-hover:text-[#111111]">03</span>
+                <span>Ambient Deck</span>
               </a>
               {/* Add more links here later */}
             </nav>
@@ -116,6 +126,29 @@ export default async function ExperimentsIndex() {
                     <div 
                       className="text-[13px] leading-relaxed relative z-20 font-mono [&>pre]:!bg-transparent [&>pre]:!m-0 [&>pre]:!p-0"
                       dangerouslySetInnerHTML={{ __html: smoothTextMorphHighlighted }}
+                    />
+                  </CodeBlockShell>
+                </div>
+              </div>
+            </div>
+
+            {/* Experiment 03: Ambient Deck */}
+            <div id="exp-03" className="flex flex-col gap-8 scroll-mt-32">
+              <LaptopFrame>
+                <AmbientDeck />
+              </LaptopFrame>
+
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-start gap-8 px-4 max-w-[1000px] mx-auto w-full">
+                <div>
+                  <h2 className="text-3xl font-black tracking-tight" style={{ fontFamily: 'var(--font-heading)' }}>Ambient Deck</h2>
+                  <p className="text-[#111111]/70 mt-2 text-lg max-w-[30ch]">Tinder-style card swiper with ambient dynamic background lighting mapping dominant image colors.</p>
+                </div>
+                
+                <div className="w-full md:w-[600px] -mt-12 -ml-0 md:-ml-8">
+                  <CodeBlockShell>
+                    <div 
+                      className="text-[13px] leading-relaxed relative z-20 font-mono [&>pre]:!bg-transparent [&>pre]:!m-0 [&>pre]:!p-0"
+                      dangerouslySetInnerHTML={{ __html: ambientDeckHighlighted }}
                     />
                   </CodeBlockShell>
                 </div>

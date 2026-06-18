@@ -14,18 +14,32 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Harshit",
-  description: "I design and engineer interactive web, software, and AI projects with a focus on clarity, performance, and meaningful user experience.",
+  metadataBase: new URL("https://harshit.page"),
+  title: {
+    default: "Harshit Singh | Portfolio & Website",
+    template: "%s | Harshit Singh"
+  },
+  description: "Official website of Harshit Singh. I design and engineer interactive web, software, and AI projects with a focus on clarity, performance, and meaningful user experience.",
+  keywords: ["Harshit", "Harshit Singh", "Harshit website", "Harshit portfolio", "LeonCyriac", "harshitkumar9030", "software engineer", "web developer", "AI developer"],
+  authors: [{ name: "Harshit Singh" }],
+  creator: "Harshit Singh",
   openGraph: {
-    title: "Harshit",
-    description: "I design and engineer interactive web, software, and AI projects with a focus on clarity, performance, and meaningful user experience.",
-    images: [{ url: "/ogimagep.png" }],
+    title: "Harshit Singh | Portfolio",
+    description: "Official website of Harshit Singh. I design and engineer interactive web, software, and AI projects.",
+    url: "https://harshit.page",
+    siteName: "Harshit Singh",
+    images: [{ url: "/ogimagep.png", width: 1200, height: 630, alt: "Harshit Singh" }],
+    locale: "en_US",
+    type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Harshit",
-    description: "I design and engineer interactive web, software, and AI projects with a focus on clarity, performance, and meaningful user experience.",
+    title: "Harshit Singh | Portfolio",
+    description: "Official website of Harshit Singh. I design and engineer interactive web, software, and AI projects.",
     images: ["/ogimagep.png"],
+  },
+  alternates: {
+    canonical: "https://harshit.page",
   },
 };
 

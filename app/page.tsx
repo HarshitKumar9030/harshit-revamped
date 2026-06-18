@@ -12,12 +12,32 @@ import { Navbar } from "@/components/ui/navbar";
 import { Marquee } from "@/components/ui/marquee";
 import { HelloLoader } from "@/components/ui/hello-loader";
 import { HomeMetrics } from "@/components/ui/home-metrics";
+import { StepHighlight } from "@/components/ui/step-highlight";
 
 export default function Home() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Harshit Singh",
+    "alternateName": ["Harshit", "LeonCyriac", "harshitkumar9030"],
+    "url": "https://harshit.page",
+    "jobTitle": "Full-Stack Developer and Software Engineer",
+    "description": "I design and engineer interactive web, software, and AI projects.",
+    "sameAs": [
+      "https://github.com/harshitkumar9030",
+      "https://github.com/LeonCyriac"
+    ]
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <HelloLoader />
       <HomeMetrics />
+      {/* <StepHighlight /> */}
       <Navbar />
       <main className="relative w-full overflow-x-hidden bg-[#F0EDE5]">
         <Hero />

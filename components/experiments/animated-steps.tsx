@@ -5,7 +5,7 @@ import { motion, useSpring } from "framer-motion";
 import { Battery, Zap, Footprints, ChevronLeft, ChevronRight } from "lucide-react";
 
 // --- Date Formatting Helper ---
-function getFormattedDate(dateObj) {
+function getFormattedDate(dateObj: Date) {
   const month = dateObj.toLocaleDateString("en-US", { month: "short" });
   const day = dateObj.getDate();
   const year = dateObj.getFullYear();
@@ -21,12 +21,13 @@ function getFormattedDate(dateObj) {
 }
 
 // --- Biometric Simulation & Color Algorithm ---
-function simulateWalkProfile(totalStepsInInterval, heightCm = 186, weightKg = 70) {
+function simulateWalkProfile(totalStepsInInterval: number, heightCm = 186, weightKg = 70) {
   const minutes = 5; // We are now using 5-minute high-density intervals
   const stepsPerMin = totalStepsInInterval / minutes;
   
   const strideLengthM = (heightCm * 0.414) / 100;
-  const distanceKm = ((totalStepsInInterval * strideLengthM) / 1000).toFixed(2);
+  const distanceKmNum = (totalStepsInInterval * strideLengthM) / 1000;
+  const distanceKm = distanceKmNum.toFixed(2);
   
   let status = "Rest";
   let Icon = Battery;
@@ -50,8 +51,8 @@ function simulateWalkProfile(totalStepsInInterval, heightCm = 186, weightKg = 70
   }
 
   // Calculate Pace (min/km) only if a valid distance was covered
-  if (distanceKm > 0.02 && (status === "Walking" || status === "Running")) {
-    const paceDecimal = minutes / distanceKm;
+  if (distanceKmNum > 0.02 && (status === "Walking" || status === "Running")) {
+    const paceDecimal = minutes / distanceKmNum;
     if (paceDecimal < 20) { // Filter out unrealistically slow paces
       const pMin = Math.floor(paceDecimal);
       const pSec = Math.floor((paceDecimal - pMin) * 60).toString().padStart(2, "0");
@@ -63,13 +64,14 @@ function simulateWalkProfile(totalStepsInInterval, heightCm = 186, weightKg = 70
 }
 
 // --- High-Density Daily Data (288 bars) ---
-const generateFullDayData = (dateSeed) => {
+const generateFullDayData = (dateSeed: Date | number) => {
+  const numericSeed = typeof dateSeed === 'number' ? dateSeed : dateSeed.getTime();
   return Array.from({ length: 288 }).map((_, i) => {
     // Math to simulate natural daily workouts (Morning Run & Evening Walk)
     const isMorningRun = i > 75 && i < 90; // ~6:15 AM - 7:30 AM
     const isEveningWalk = i > 210 && i < 230; // ~5:30 PM - 7:10 PM
     
-    const seedRandom = Math.sin(dateSeed + i) * 10000;
+    const seedRandom = Math.sin(numericSeed + i) * 10000;
     const randomVal = seedRandom - Math.floor(seedRandom);
     
     const isActive = isMorningRun || isEveningWalk || randomVal > 0.85;
@@ -108,10 +110,10 @@ export default function RunVisualizer() {
 
   const data = useMemo(() => generateFullDayData(currentDate.getTime()), [currentDate]);
   
-  const chartRef = useRef(null);
-  const lastHoveredId = useRef(null); 
+  const chartRef = useRef<HTMLDivElement>(null);
+  const lastHoveredId = useRef<number | null>(null); 
   
-  const [hoveredBar, setHoveredBar] = useState(null);
+  const [hoveredBar, setHoveredBar] = useState<any>(null);
   const [isInside, setIsInside] = useState(false);
   
   const cursorX = useSpring(0, { stiffness: 500, damping: 40 });
@@ -128,7 +130,7 @@ export default function RunVisualizer() {
     audio.play().catch(() => {}); 
   };
 
-  const handlePointerMove = (e) => {
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     setIsInside(true);
     if (!chartRef.current) return;
 

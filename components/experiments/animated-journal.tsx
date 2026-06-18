@@ -37,7 +37,7 @@ const JOURNAL_ENTRIES = [
 ];
 
 export default function JournalShowcase() {
-  const [hoveredId, setHoveredId] = useState(null);
+  const [hoveredId, setHoveredId] = useState<number | null>(null);
 
   return (
     <div className="w-full min-h-screen bg-[#111111] text-[#e2e2e2] font-mono selection:bg-[#C43114] selection:text-white py-24 px-8 sm:px-16 flex justify-center">

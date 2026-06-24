@@ -47,7 +47,7 @@ async function fetchText(url: string): Promise<string | null> {
     const response = await fetch(url, {
       signal,
       headers: {
-        Accept: "image/svg+xml,text/html;q=0.9,*/*;q=0.8",
+        Accept: "text/html;q=0.9,*/*;q=0.8",
         "User-Agent": "Mozilla/5.0",
       },
       next: {
@@ -99,17 +99,61 @@ function readAttr(tag: string, attribute: string): string {
   return match?.[1] ?? "";
 }
 
-function parseContributionDays(svg: string): ContributionDay[] {
-  const rectTags = svg.match(/<rect\b[^>]*data-date="[^"]+"[^>]*>/g) ?? [];
+function parseContributionDays(html: string): ContributionDay[] {
+  const days: ContributionDay[] = [];
+  
+  // 1. Modern GitHub DOM (Uses <td class="ContributionCalendar-day">)
+  const tdRegex = /<td\b([^>]*class="[^"]*ContributionCalendar-day[^"]*"[^>]*)>/g;
+  let match;
+  
+  while ((match = tdRegex.exec(html)) !== null) {
+    const tagProps = match[1];
+    const date = readAttr(tagProps, "data-date");
+    const level = readAttr(tagProps, "data-level");
+    const id = readAttr(tagProps, "id");
+    
+    if (!date) continue;
 
-  return rectTags
-    .map((tag) => ({
-      date: readAttr(tag, "data-date"),
-      count: Number(readAttr(tag, "data-count") || 0),
-      level: Number(readAttr(tag, "data-level") || 0),
-    }))
-    .filter((day) => day.date.length > 0)
-    .sort((left, right) => Date.parse(left.date) - Date.parse(right.date));
+    let count = 0;
+    if (id) {
+      // Find the associated tooltip to extract the commit count string
+      const tooltipRegex = new RegExp(`<tool-tip[^>]*for="${id}"[^>]*>([^<]+)<\/tool-tip>`);
+      const tooltipMatch = html.match(tooltipRegex);
+      
+      if (tooltipMatch) {
+        const text = tooltipMatch[1]; // e.g. "7 contributions on Jan 1st"
+        if (!text.toLowerCase().includes("no contributions")) {
+          // Replace commas for counts >= 1,000 to ensure proper parsing
+          const numMatch = text.replace(/,/g, "").match(/\d+/);
+          count = numMatch ? parseInt(numMatch[0], 10) : 0;
+        }
+      } else {
+         // Fallback inside the tag itself
+         const fallbackCount = readAttr(tagProps, "data-count");
+         if (fallbackCount) count = parseInt(fallbackCount, 10);
+      }
+    }
+    
+    days.push({
+      date,
+      count,
+      level: parseInt(level, 10) || 0
+    });
+  }
+
+  // 2. Fallback for older <rect> based graphs (Just in case they revert or you use GitHub Enterprise)
+  if (days.length === 0) {
+    const rectTags = html.match(/<rect\b[^>]*data-date="[^"]+"[^>]*>/g) ?? [];
+    for (const tag of rectTags) {
+      days.push({
+        date: readAttr(tag, "data-date"),
+        count: Number(readAttr(tag, "data-count") || 0),
+        level: Number(readAttr(tag, "data-level") || 0),
+      });
+    }
+  }
+
+  return days.sort((left, right) => Date.parse(left.date) - Date.parse(right.date));
 }
 
 function calculateCurrentStreak(days: ContributionDay[]): number {
@@ -145,11 +189,12 @@ function calculateLongestStreak(days: ContributionDay[]): number {
 }
 
 export async function getGithubMetrics(username = DEFAULT_USERNAME): Promise<GithubMetrics> {
-  const year = new Date().getFullYear();
-  const today = new Date().toISOString().slice(0, 10);
-  const contributionsUrl = `https://github.com/users/${username}/contributions?from=${year}-01-01&to=${today}`;
+  // Removing the ?from and ?to parameters makes GitHub default to retrieving the trailing 365 days.
+  // This solves a nasty edge-case where if you checked your portfolio in February, it would only 
+  // return 30 total days, completely breaking the 56-day heatmap visualizer grid.
+  const contributionsUrl = `https://github.com/users/${username}/contributions`;
 
-  const [profile, svg] = await Promise.all([
+  const [profile, html] = await Promise.all([
     fetchJson<GithubProfile & { html_url?: string; avatar_url?: string; public_repos?: number }>(
       `https://api.github.com/users/${username}`
     ),
@@ -169,7 +214,7 @@ export async function getGithubMetrics(username = DEFAULT_USERNAME): Promise<Git
       }
     : null;
 
-  const days = svg ? parseContributionDays(svg) : [];
+  const days = html ? parseContributionDays(html) : [];
   const totalContributions = days.reduce((sum, day) => sum + day.count, 0);
   const activeDays = days.filter((day) => day.count > 0).length;
   const currentStreak = calculateCurrentStreak(days);

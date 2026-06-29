@@ -14,7 +14,7 @@ const PLANS = [
     color: "#D9ED92",
     text: "#2A2A2A",
     popular: false,
-    description: "just need a really good landing page? this is it. sharp fast and impossible to forget",
+    description: "need a landing page that actually makes people stop scrolling? built for speed premium interactions and turning visitors into enquiries",
     perks: ["up to 6 sections + contact form", "turns visitors into enquiries", "premium interactions", "loads in under 2 seconds"],
     footer: "perfect for personal brands startups or getting a fast concept out there",
   },
@@ -31,7 +31,7 @@ const PLANS = [
   },
   {
     name: "Business Website",
-    price: "30k–40k",
+    price: "35k+",
     delivery: "2–3 weeks",
     color: "#FF9E9E",
     text: "#2A2A2A",
@@ -260,7 +260,7 @@ export function MyPlans() {
         </div>
       </section>
 
-      {/* Connect Modal Overlay with smooth opening & closing animations */}
+      {/* Connect Modal Overlay */}
       <div 
         className={`fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${
           isModalOpen ? "opacity-100 visible bg-[#111111]/80 backdrop-blur-md" : "opacity-0 invisible bg-transparent backdrop-blur-none"

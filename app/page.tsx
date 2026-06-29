@@ -6,6 +6,7 @@ import { Experience } from "@/components/sections/experience";
 import { Projects } from "@/components/sections/projects";
 import { AnimeSpotlight } from "@/components/sections/anime";
 import { CrunchyStatus } from "@/components/sections/crunchy";
+import { MyPlans } from "@/components/sections/plans";
 import { Contact } from "@/components/sections/contact";
 import { Footer } from "@/components/sections/footer";
 import { Navbar } from "@/components/ui/navbar";
@@ -41,6 +42,7 @@ export default function Home() {
       <main className="relative w-full overflow-x-hidden bg-[#F0EDE5]">
         <Hero />
         <About />
+        <MyPlans />
         <GithubContributions />
         <Expertise />
         <Projects />

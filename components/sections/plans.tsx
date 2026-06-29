@@ -10,36 +10,44 @@ const PLANS = [
   {
     name: "Launch Page",
     price: "15k",
+    delivery: "5–7 days",
     color: "#D9ED92",
     text: "#2A2A2A",
-    description: "a single page site with killer ui built to feel sharp fast and impossible to forget",
-    perks: ["hero-first storytelling", "motion heavy sections", "tuned for speed"],
+    popular: false,
+    description: "just need a really good landing page? this is it. sharp fast and impossible to forget",
+    perks: ["up to 6 sections + contact form", "turns visitors into enquiries", "premium interactions", "loads in under 2 seconds"],
     footer: "perfect for personal brands startups or getting a fast concept out there",
   },
   {
     name: "Section Add-on",
-    price: "+1k",
+    price: "+3k",
+    delivery: "varies",
     color: "#D3D0C7",
     text: "#2A2A2A",
+    popular: false,
     description: "when your site needs to grow each new section gets priced on its own so we keep things simple",
     perks: ["scales with your scope", "keeps the homepage focused", "works with any stack"],
     footer: "keeps the base light while making sure the design stays looking expensive",
   },
   {
-    name: "CMS Website",
+    name: "Business Website",
     price: "30k–40k",
+    delivery: "2–3 weeks",
     color: "#FF9E9E",
     text: "#2A2A2A",
-    description: "a polished site with a full cms so you can drop in new content without calling me every time",
-    perks: ["easy content updates", "admin friendly workflows", "seo ready structure"],
+    popular: true,
+    description: "a polished site powered by a cms so you can edit everything yourself without calling me every time",
+    perks: ["manage your own content", "admin friendly workflows", "seo ready structure"],
     footer: "for teams that want full control without ruining the visual system",
   },
   {
-    name: "Traffic / Custom",
+    name: "Custom Web App",
     price: "80k+",
+    delivery: "based on scope",
     color: "#F0EDE5",
     text: "#2A2A2A",
-    description: "for sites getting real traffic or needing complex flows custom scope is the only way to go",
+    popular: false,
+    description: "for platforms getting real traffic or needing complex flows custom scope is the only way to go",
     perks: ["high traffic architecture", "custom ux systems", "scalable performance"],
     footer: "if you expect a lot of eyes custom is the safer and better choice",
   },
@@ -49,7 +57,6 @@ export function MyPlans() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Lock body scroll when modal is open
   useEffect(() => {
     if (isModalOpen) {
       document.body.style.overflow = "hidden";
@@ -65,7 +72,6 @@ export function MyPlans() {
     registerGsap();
     gsap.registerPlugin(ScrollTrigger);
 
-    // Animate Header
     gsap.fromTo(
       ".plans-header",
       { y: 60, opacity: 0 },
@@ -81,7 +87,6 @@ export function MyPlans() {
       }
     );
 
-    // Individual scroll triggers for each card
     const cards = gsap.utils.toArray<HTMLElement>(".plan-card");
     
     cards.forEach((card) => {
@@ -91,7 +96,7 @@ export function MyPlans() {
           y: 120, 
           opacity: 0,
           scale: 0.95,
-          rotateX: 5 // subtle 3D tilt on enter
+          rotateX: 5
         },
         {
           y: 0,
@@ -99,10 +104,10 @@ export function MyPlans() {
           scale: 1,
           rotateX: 0,
           duration: 0.8,
-          ease: "back.out(1.2)", // snappy brutalist bounce
+          ease: "back.out(1.2)",
           scrollTrigger: {
             trigger: card,
-            start: "top 85%", // Triggers right as the card peeks into the bottom 15% of the screen
+            start: "top 85%",
             toggleActions: "play none none none",
           },
         }
@@ -139,18 +144,25 @@ export function MyPlans() {
             >
               
               {/* Top: Name & Animated Arrow */}
-              <div className="flex items-start justify-between gap-4">
-                <h3 className="text-[10vw] md:text-[5.5vw] font-bold leading-none tracking-tighter" style={{ fontFamily: "var(--font-heading)" }}>
-                  {p.name}
-                </h3>
-                
-                <div className="relative w-10 h-10 md:w-12 md:h-12 overflow-hidden shrink-0 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500">
-                  <svg className="absolute w-full h-full transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:translate-x-[150%] group-hover:-translate-y-[150%]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="square">
-                    <path d="M7 17L17 7M7 7h10v10" />
-                  </svg>
-                  <svg className="absolute w-full h-full -translate-x-[150%] translate-y-[150%] transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:translate-x-0 group-hover:translate-y-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="square">
-                    <path d="M7 17L17 7M7 7h10v10" />
-                  </svg>
+              <div>
+                {p.popular && (
+                  <span className="inline-block mb-6 bg-[#2A2A2A] text-[#FF9E9E] px-4 py-1.5 text-sm md:text-base font-bold tracking-tight">
+                    most popular
+                  </span>
+                )}
+                <div className="flex items-start justify-between gap-4">
+                  <h3 className="text-[10vw] md:text-[5.5vw] font-bold leading-none tracking-tighter" style={{ fontFamily: "var(--font-heading)" }}>
+                    {p.name}
+                  </h3>
+                  
+                  <div className="relative w-10 h-10 md:w-12 md:h-12 overflow-hidden shrink-0 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500">
+                    <svg className="absolute w-full h-full transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:translate-x-[150%] group-hover:-translate-y-[150%]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="square">
+                      <path d="M7 17L17 7M7 7h10v10" />
+                    </svg>
+                    <svg className="absolute w-full h-full -translate-x-[150%] translate-y-[150%] transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:translate-x-0 group-hover:translate-y-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="square">
+                      <path d="M7 17L17 7M7 7h10v10" />
+                    </svg>
+                  </div>
                 </div>
               </div>
 
@@ -170,33 +182,55 @@ export function MyPlans() {
               </div>
 
               {/* Bottom: Use Case & Price */}
-              <div className="flex flex-col-reverse md:flex-row md:items-end justify-between gap-8 border-t-4 border-current/20 pt-8">
+              <div className="flex flex-col-reverse lg:flex-row lg:items-end justify-between gap-8 border-t-4 border-current/20 pt-8">
                 <div className="max-w-[280px]">
                   <p className="text-base font-bold opacity-50 mb-1">target use case</p>
                   <p className="text-lg md:text-xl font-bold leading-tight">{p.footer}</p>
                 </div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-[12vw] md:text-[6vw] font-bold leading-none tracking-tighter" style={{ fontFamily: "var(--font-heading)" }}>
-                    {p.price}
-                  </span>
-                  <span className="text-2xl md:text-3xl font-bold opacity-60">
-                    INR
-                  </span>
+                <div className="flex flex-col lg:items-end">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-[12vw] md:text-[6vw] font-bold leading-none tracking-tighter" style={{ fontFamily: "var(--font-heading)" }}>
+                      {p.price}
+                    </span>
+                    <span className="text-2xl md:text-3xl font-bold opacity-60">
+                      INR
+                    </span>
+                  </div>
+                  <p className="text-base font-bold opacity-60 mt-1 lg:mt-2">takes {p.delivery}</p>
                 </div>
               </div>
 
             </div>
           ))}
 
+          {/* Included in every project Banner */}
+          <div 
+            onClick={() => setIsModalOpen(true)}
+            className="plan-card lg:col-span-2 bg-[#DBC2FC] p-8 md:p-12 text-[#2A2A2A] border-none transition-transform duration-500 hover:scale-[1.01] cursor-pointer group flex flex-col md:flex-row justify-between items-start md:items-center gap-8 md:gap-12"
+          >
+            <div className="shrink-0">
+              <p className="text-3xl md:text-4xl font-bold tracking-tight">included in every project</p>
+              <p className="text-lg md:text-xl font-medium mt-2 opacity-70">no hidden fees no bs</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-4 font-bold text-lg md:text-xl w-full">
+              <span className="flex items-center gap-3"><span className="w-2.5 h-2.5 bg-current" /> mobile responsive</span>
+              <span className="flex items-center gap-3"><span className="w-2.5 h-2.5 bg-current" /> seo basics</span>
+              <span className="flex items-center gap-3"><span className="w-2.5 h-2.5 bg-current" /> fast loading</span>
+              <span className="flex items-center gap-3"><span className="w-2.5 h-2.5 bg-current" /> custom design</span>
+              <span className="flex items-center gap-3"><span className="w-2.5 h-2.5 bg-current" /> deployment</span>
+              <span className="flex items-center gap-3"><span className="w-2.5 h-2.5 bg-current" /> 14-day bug support</span>
+            </div>
+          </div>
+
           {/* The Fine Print blocks */}
-          <div className="plan-card lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 mt-6 md:mt-10 origin-center">
+          <div className="plan-card lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 origin-center">
             <div 
               onClick={() => setIsModalOpen(true)}
               className="bg-[#1A1A1A] p-8 md:p-12 text-[#F0EDE5] border-none transition-transform duration-500 hover:scale-[1.02] cursor-pointer group h-full flex flex-col justify-between"
             >
               <div>
                 <div className="flex justify-between items-start">
-                  <p className="text-3xl md:text-4xl font-bold tracking-tight">Maintenance</p>
+                  <p className="text-3xl md:text-4xl font-bold tracking-tight">maintenance</p>
                   <ArrowUpRight className="w-8 h-8 opacity-0 -translate-x-2 translate-y-2 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-300 text-[#D9ED92]" />
                 </div>
                 <p className="text-2xl md:text-3xl font-bold text-[#D9ED92] mt-2">999 / mo recurring</p>
@@ -212,10 +246,10 @@ export function MyPlans() {
             >
               <div>
                 <div className="flex justify-between items-start">
-                  <p className="text-3xl md:text-4xl font-bold tracking-tight">Traffic rule</p>
+                  <p className="text-3xl md:text-4xl font-bold tracking-tight">traffic rule</p>
                   <ArrowUpRight className="w-8 h-8 opacity-0 -translate-x-2 translate-y-2 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-300 text-[#FF9E9E]" />
                 </div>
-                <p className="text-2xl md:text-3xl font-bold text-[#FF9E9E] mt-2">Custom preferred</p>
+                <p className="text-2xl md:text-3xl font-bold text-[#FF9E9E] mt-2">custom preferred</p>
               </div>
               <p className="text-lg md:text-2xl font-medium leading-tight mt-12 md:mt-16 opacity-80 max-w-md">
                 high traffic means tailored caching and architecture generic plans just break under scale
@@ -226,7 +260,7 @@ export function MyPlans() {
         </div>
       </section>
 
-      {/* Connect Modal Overlay */}
+      {/* Connect Modal Overlay with smooth opening & closing animations */}
       <div 
         className={`fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${
           isModalOpen ? "opacity-100 visible bg-[#111111]/80 backdrop-blur-md" : "opacity-0 invisible bg-transparent backdrop-blur-none"

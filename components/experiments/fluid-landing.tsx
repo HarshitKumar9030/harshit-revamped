@@ -60,7 +60,7 @@ class PhysicsBlob {
       const dxM = mouse.x - this.x;
       const dyM = mouse.y - this.y;
       const distM = Math.sqrt(dxM * dxM + dyM * dyM);
-      if (distM < 400) {
+      if (distM > 0 && distM < 400) {
         this.vx += (dxM / distM) * 0.25;
         this.vy += (dyM / distM) * 0.25;
       }
@@ -82,6 +82,7 @@ class PhysicsBlob {
 
 // --- Component ---
 export const FluidLanding: React.FC = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const glCanvasRef = useRef<HTMLCanvasElement>(null);
   const physicsCanvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -98,9 +99,10 @@ export const FluidLanding: React.FC = () => {
   // Event Handlers for Magnetic UI
   const handleMagnetEnter = (e: React.MouseEvent<HTMLElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
+    const containerRect = containerRef.current?.getBoundingClientRect();
     state.current.activeMagnet = {
-      x: rect.left + rect.width / 2,
-      y: rect.top + rect.height / 2,
+      x: rect.left - (containerRect?.left ?? 0) + rect.width / 2,
+      y: rect.top - (containerRect?.top ?? 0) + rect.height / 2,
     };
     state.current.targetMouse.r = 220;
   };
@@ -113,14 +115,16 @@ export const FluidLanding: React.FC = () => {
   useEffect(() => {
     const glCanvas = glCanvasRef.current;
     const pCanvas = physicsCanvasRef.current;
-    if (!glCanvas || !pCanvas) return;
+    const container = containerRef.current;
+    if (!glCanvas || !pCanvas || !container) return;
 
     const gl = glCanvas.getContext('webgl2');
     const ctx = pCanvas.getContext('2d');
     if (!gl || !ctx) return;
 
-    let glFrameId: number;
-    let physicsFrameId: number;
+    let frameId: number | null = null;
+    let isVisible = true;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     // --- Interaction Listeners ---
     const updateMouse = (x: number, y: number) => {
@@ -133,9 +137,10 @@ export const FluidLanding: React.FC = () => {
       state.current.targetMouse.y = y;
     };
 
-    const onMouseMove = (e: MouseEvent) => updateMouse(e.clientX, e.clientY);
-    const onTouchMove = (e: TouchEvent) =>
-      updateMouse(e.touches[0].clientX, e.touches[0].clientY);
+    const onPointerMove = (e: PointerEvent) => {
+      const rect = container.getBoundingClientRect();
+      updateMouse(e.clientX - rect.left, e.clientY - rect.top);
+    };
 
     const triggerShockwave = () => {
       state.current.targetMouse.r = 30; // Shrink cursor sharply
@@ -144,7 +149,7 @@ export const FluidLanding: React.FC = () => {
         const dx = b.x - mouse.x;
         const dy = b.y - mouse.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 600) {
+        if (dist > 0 && dist < 600) {
           const force = (600 - dist) * 0.2;
           b.vx += (dx / dist) * force;
           b.vy += (dy / dist) * force;
@@ -156,18 +161,16 @@ export const FluidLanding: React.FC = () => {
       state.current.targetMouse.r = state.current.activeMagnet ? 220 : 80;
     };
 
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('touchmove', onTouchMove);
-    window.addEventListener('mousedown', triggerShockwave);
-    window.addEventListener('touchstart', triggerShockwave);
-    window.addEventListener('mouseup', restoreCursor);
-    window.addEventListener('touchend', restoreCursor);
+    container.addEventListener("pointermove", onPointerMove);
+    container.addEventListener("pointerdown", triggerShockwave);
+    container.addEventListener("pointerup", restoreCursor);
+    container.addEventListener("pointercancel", restoreCursor);
 
     // --- Initialization & Resizing ---
     const initPhysics = () => {
       const { width, height } = state.current;
-      state.current.blobs = Array.from({ length: 30 }, () => {
-        const r = 20 + Math.random() * 80;
+      state.current.blobs = Array.from({ length: reduceMotion ? 8 : 14 }, () => {
+        const r = 18 + Math.random() * 62;
         return new PhysicsBlob(
           width / 2 + (Math.random() - 0.5) * 300,
           height / 2 + (Math.random() - 0.5) * 300,
@@ -177,8 +180,9 @@ export const FluidLanding: React.FC = () => {
     };
 
     const resize = () => {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
+      const { width: containerWidth, height: containerHeight } = container.getBoundingClientRect();
+      const width = Math.max(1, Math.floor(containerWidth));
+      const height = Math.max(1, Math.floor(containerHeight));
       state.current.width = width;
       state.current.height = height;
 
@@ -216,7 +220,7 @@ export const FluidLanding: React.FC = () => {
       float fbm(vec2 p) {
           float v = 0.0; float a = 0.5;
           mat2 rot = mat2(cos(0.5), -sin(0.5), sin(0.5), cos(0.5));
-          for (int i = 0; i < 5; ++i) {
+          for (int i = 0; i < 3; ++i) {
               v += a * noise(p); p = rot * p * 2.0 + vec2(100.0); a *= 0.5;
           }
           return v;
@@ -308,16 +312,9 @@ export const FluidLanding: React.FC = () => {
     const resLoc = gl.getUniformLocation(program, 'u_resolution');
     const mouseLoc = gl.getUniformLocation(program, 'u_mouse');
 
-    window.addEventListener('resize', resize);
-    resize(); // Initial sizing
-
-    // --- Render Loops ---
-    const renderWebGL = (time: number) => {
-      gl.uniform1f(timeLoc, time * 0.001);
-      gl.uniform2f(mouseLoc, state.current.mouse.x, state.current.mouse.y);
-      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-      glFrameId = requestAnimationFrame(renderWebGL);
-    };
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(container);
+    resize();
 
     const clamp = (min: number, val: number, max: number) =>
       Math.max(min, Math.min(max, val));
@@ -375,32 +372,47 @@ export const FluidLanding: React.FC = () => {
       ctx.arc(mouse.x, mouse.y, mouse.r, 0, Math.PI * 2);
       ctx.fill();
 
-      physicsFrameId = requestAnimationFrame(renderPhysics);
     };
 
-    glFrameId = requestAnimationFrame(renderWebGL);
-    physicsFrameId = requestAnimationFrame(renderPhysics);
+    const render = (time: number) => {
+      frameId = null;
+      if (!isVisible) return;
+
+      gl.uniform1f(timeLoc, time * 0.001);
+      gl.uniform2f(mouseLoc, state.current.mouse.x, state.current.mouse.y);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      renderPhysics();
+
+      if (!reduceMotion) {
+        frameId = requestAnimationFrame(render);
+      }
+    };
+
+    const visibilityObserver = new IntersectionObserver(([entry]) => {
+      isVisible = entry.isIntersecting;
+      if (isVisible && frameId === null) {
+        frameId = requestAnimationFrame(render);
+      }
+    });
+    visibilityObserver.observe(container);
+    frameId = requestAnimationFrame(render);
 
     // Cleanup
     return () => {
-      cancelAnimationFrame(glFrameId);
-      cancelAnimationFrame(physicsFrameId);
-      window.removeEventListener('resize', resize);
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('touchmove', onTouchMove);
-      window.removeEventListener('mousedown', triggerShockwave);
-      window.removeEventListener('touchstart', triggerShockwave);
-      window.removeEventListener('mouseup', restoreCursor);
-      window.removeEventListener('touchend', restoreCursor);
+      if (frameId !== null) cancelAnimationFrame(frameId);
+      resizeObserver.disconnect();
+      visibilityObserver.disconnect();
+      container.removeEventListener("pointermove", onPointerMove);
+      container.removeEventListener("pointerdown", triggerShockwave);
+      container.removeEventListener("pointerup", restoreCursor);
+      container.removeEventListener("pointercancel", restoreCursor);
     };
   }, []);
 
   return (
-    <div className="fluid-landing-container">
+    <div ref={containerRef} className="fluid-landing-container">
       {/* Dynamic Styles Specific to the Component */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Syne:wght@600;700;800&display=swap');
-
         .fluid-landing-container {
           --bg-color: #020203;
           --text-light: #ffffff;
@@ -409,14 +421,15 @@ export const FluidLanding: React.FC = () => {
           --border: rgba(255, 255, 255, 0.12);
           
           position: relative;
-          width: 100vw;
-          height: 100vh;
+          width: 100%;
+          height: 100%;
           overflow: hidden;
           background-color: var(--bg-color);
           font-family: 'Inter', sans-serif;
           color: var(--text-light);
           user-select: none;
           -webkit-tap-highlight-color: transparent;
+          touch-action: manipulation;
         }
 
         .gl-canvas {
@@ -424,6 +437,7 @@ export const FluidLanding: React.FC = () => {
           top: 0; left: 0;
           width: 100%; height: 100%;
           z-index: 1;
+          pointer-events: none;
         }
 
         .mask-container {

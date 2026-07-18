@@ -9,6 +9,7 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "All Scrawls",
   description: "Browse all writings, technical notes, and observations.",
+  alternates: { canonical: "/scrawl/all" },
   openGraph: {
     title: "All Scrawls",
     description: "Browse all writings, technical notes, and observations.",

@@ -14,19 +14,31 @@ import { Marquee } from "@/components/ui/marquee";
 import { HelloLoader } from "@/components/ui/hello-loader";
 import { HomeMetrics } from "@/components/ui/home-metrics";
 import { GithubContributions } from "@/components/sections/github-contributions";
+import { absoluteUrl, serializeJsonLd } from "@/lib/seo";
 
 export default function Home() {
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Person",
-    "name": "Harshit Singh",
-    "alternateName": ["Harshit", "LeonCyriac", "harshitkumar9030"],
-    "url": "https://harshit.page",
-    "jobTitle": "Full-Stack Developer and Software Engineer",
-    "description": "I design and engineer interactive web, software, and AI projects.",
-    "sameAs": [
-      "https://github.com/harshitkumar9030",
-      "https://github.com/LeonCyriac"
+    "@graph": [
+      {
+        "@type": "Person",
+        "@id": `${absoluteUrl("/")}#person`,
+        "name": "Harshit Singh",
+        "alternateName": ["Harshit", "harshitkumar9030"],
+        "url": absoluteUrl("/"),
+        "jobTitle": "Full-Stack Developer and Software Engineer",
+        "description": "Harshit Singh designs and engineers interactive web, software, and AI projects.",
+        "sameAs": [
+          "https://github.com/harshitkumar9030"
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${absoluteUrl("/")}#website`,
+        "name": "Harshit Singh",
+        "url": absoluteUrl("/"),
+        "publisher": { "@id": `${absoluteUrl("/")}#person` }
+      }
     ]
   };
 
@@ -34,7 +46,7 @@ export default function Home() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
       <HelloLoader />
       <HomeMetrics />

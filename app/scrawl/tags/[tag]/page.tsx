@@ -1,4 +1,4 @@
-import { getScrawlBySlug, getAllScrawls } from "@/lib/mdx";
+import { getAllScrawls } from "@/lib/mdx";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -17,6 +17,9 @@ export async function generateMetadata({ params }: TagPageProps): Promise<Metada
   return { 
     title: `${decodedTag} Scrawls`,
     description: `Read technical notes and writings categorized under ${decodedTag}.`,
+    alternates: {
+      canonical: `/scrawl/tags/${encodeURIComponent(tag.toLowerCase())}`,
+    },
     openGraph: {
       title: `${decodedTag} Scrawls`,
       description: `Read technical notes and writings categorized under ${decodedTag}.`,

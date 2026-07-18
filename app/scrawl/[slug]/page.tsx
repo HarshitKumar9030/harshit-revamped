@@ -14,6 +14,7 @@ import { mdxComponents } from "@/components/ui/mdx-components";
 // Load Katex stylesheet globally for math styling, but local to this route
 import "katex/dist/katex.min.css"; 
 import { Metadata } from "next";
+import { absoluteUrl, serializeJsonLd } from "@/lib/seo";
 
 interface ScrawlPageProps {
   params: Promise<{ slug: string }>;
@@ -24,13 +25,18 @@ export async function generateMetadata({ params } : ScrawlPageProps): Promise<Me
   try {
     const { meta } = await getScrawlBySlug(slug);
     return { 
-      title: `${meta.title} | Scrawl`,
+      title: meta.title,
       description: meta.excerpt,
+      alternates: {
+        canonical: `/scrawl/${encodeURIComponent(slug)}`,
+      },
       openGraph: {
         title: meta.title,
         description: meta.excerpt,
         type: 'article',
+        url: absoluteUrl(`/scrawl/${encodeURIComponent(slug)}`),
         publishedTime: meta.date,
+        authors: ["Harshit Singh"],
         tags: meta.tags,
         images: meta.image ? [{ url: meta.image }] : [{ url: "/ogimagep.png" }],
       },
@@ -41,8 +47,8 @@ export async function generateMetadata({ params } : ScrawlPageProps): Promise<Me
         images: meta.image ? [meta.image] : ["/ogimagep.png"],
       }
     };
-  } catch (error) {
-    return { title: '404 - Scrawl Not Found' };
+  } catch {
+    return { title: "Scrawl not found", robots: { index: false, follow: false } };
   }
 }
 
@@ -63,8 +69,36 @@ export default async function ScrawlPage({ params } : ScrawlPageProps) {
     notFound();
   }
 
+  const articleUrl = absoluteUrl(`/scrawl/${encodeURIComponent(slug)}`);
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.meta.title,
+    description: post.meta.excerpt,
+    datePublished: post.meta.date,
+    dateModified: post.meta.date,
+    mainEntityOfPage: articleUrl,
+    url: articleUrl,
+    ...(post.meta.image ? { image: absoluteUrl(post.meta.image) } : {}),
+    author: {
+      "@type": "Person",
+      name: "Harshit Singh",
+      url: absoluteUrl("/"),
+    },
+    publisher: {
+      "@type": "Person",
+      name: "Harshit Singh",
+      url: absoluteUrl("/"),
+    },
+    ...(post.meta.tags?.length ? { keywords: post.meta.tags.join(", ") } : {}),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
+      />
       <Navbar />
       <div className="w-full min-h-screen bg-[#FDFBF7] text-[#111111] selection:bg-[#D9ED92] selection:text-[#111111] relative overflow-x-hidden pt-32 pb-48">
         

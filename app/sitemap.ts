@@ -1,44 +1,61 @@
-import { MetadataRoute } from 'next';
-import { getAllScrawls } from '@/lib/mdx';
+import type { MetadataRoute } from "next";
+import { getAllScrawls } from "@/lib/mdx";
+import { absoluteUrl } from "@/lib/seo";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://harshit.page';
-
-  // Base routes
   const routes = [
     {
-      url: baseUrl,
+      url: absoluteUrl("/"),
       lastModified: new Date(),
       changeFrequency: 'weekly' as const,
       priority: 1,
     },
     {
-      url: `${baseUrl}/scrawl`,
+      url: absoluteUrl("/scrawl"),
       lastModified: new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/experiments`,
+      url: absoluteUrl("/experiments"),
       lastModified: new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.8,
     },
+    {
+      url: absoluteUrl("/scrawl/all"),
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    },
+    {
+      url: absoluteUrl("/scrawl/tags"),
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.6,
+    },
   ];
 
-  // Dynamic Scrawl MDX routes
   try {
     const scrawls = await getAllScrawls();
     const scrawlRoutes = scrawls.map((scrawl) => ({
-      url: `${baseUrl}/scrawl/${scrawl.slug}`,
+      url: absoluteUrl(`/scrawl/${encodeURIComponent(scrawl.slug)}`),
       lastModified: new Date(scrawl.date),
       changeFrequency: 'monthly' as const,
       priority: 0.6,
+      ...(scrawl.image ? { images: [absoluteUrl(scrawl.image)] } : {}),
     }));
-    
-    return [...routes, ...scrawlRoutes];
-  } catch (error) {
-    // Fallback if no scrawls found or reading fails during build
+
+    const tags = new Set(scrawls.flatMap((scrawl) => scrawl.tags ?? []));
+    const tagRoutes = [...tags].map((tag) => ({
+      url: absoluteUrl(`/scrawl/tags/${encodeURIComponent(tag.toLowerCase())}`),
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.5,
+    }));
+
+    return [...routes, ...scrawlRoutes, ...tagRoutes];
+  } catch {
     return routes;
   }
 }

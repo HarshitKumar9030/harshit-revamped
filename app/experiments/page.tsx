@@ -11,8 +11,9 @@ import { gooeyMaskCode, smoothTextMorphCode, ambientDeckCode, fluidLandingCode }
 import { codeToHtml } from "shiki";
 
 export const metadata: Metadata = {
-  title: "Experiments | Harshit's Scrawl & Web Components",
+  title: "Experiments",
   description: "A scratchpad of interactive animations, spring physics, React components, and creative developer experiments.",
+  alternates: { canonical: "/experiments" },
   openGraph: {
     title: "Experiments | Harshit",
     description: "A scratchpad of interactive animations, spring physics, React components, and creative developer experiments.",

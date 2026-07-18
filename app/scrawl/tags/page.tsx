@@ -10,6 +10,7 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Scrawl Tags",
   description: "Browse writings and notes by topics.",
+  alternates: { canonical: "/scrawl/tags" },
   openGraph: {
     title: "Scrawl Tags",
     description: "Browse writings and notes by topics.",
@@ -27,13 +28,13 @@ export default async function TagsIndex() {
   const scrawls = await getAllScrawls();
   const mdxTags = Array.from(new Set(scrawls.flatMap((s) => s.tags || [])));
   
-  let dbTags: Record<string, { hotness: number, count: number }> = {};
+  const dbTags: Record<string, { hotness: number, count: number }> = {};
   
   try {
     const db = await connectToDatabase();
     if (db) {
       const records = await TagMetric.find().lean();
-      records.forEach((record: any) => {
+      records.forEach((record: { name: string; hotness?: number; count?: number }) => {
         dbTags[record.name.toLowerCase()] = {
           hotness: record.hotness || 0,
           count: record.count || 0
@@ -82,7 +83,7 @@ export default async function TagsIndex() {
 
           {/* Tags Grid */}
           <div className="w-full max-w-[85ch] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {combinedTags.map((tag, i) => (
+            {combinedTags.map((tag) => (
               <Link 
                 key={tag.name} 
                 href={`/scrawl/tags/${tag.name.toLowerCase()}`}

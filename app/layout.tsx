@@ -17,8 +17,8 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Harshit Singh — Software Engineer & Creative Developer",
-    template: "%s | Harshit Singh",
+    default: "Harshit Singh · Software Engineer for Web and AI",
+    template: "%s · Harshit Singh",
   },
   description: "Harshit Singh is a software engineer and creative developer building interactive web, AI, and product experiences.",
   applicationName: "Harshit Singh",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Harshit Singh — Software Engineer & Creative Developer",
+    title: "Harshit Singh · Software Engineer for Web and AI",
     description: "Interactive web, AI, and product experiences by Harshit Singh.",
     url: SITE_URL,
     siteName: "Harshit Singh",
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Harshit Singh — Software Engineer & Creative Developer",
+    title: "Harshit Singh · Software Engineer for Web and AI",
     description: "Interactive web, AI, and product experiences by Harshit Singh.",
     images: ["/ogimagep.png"],
   },

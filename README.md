@@ -34,3 +34,9 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Analytics
+
+Set `NEXT_PUBLIC_HARSHIT_METRICS_KEY` to your project’s browser ingestion key before building. Optionally set `NEXT_PUBLIC_METRICS_ENDPOINT` to the full collector URL for a self-hosted Metrics instance. Without a key, the external tracker stays off. Scrawl view counts still use the site’s own database.
+
+The site installs the checked-in SDK tarball until this version is available on npm. To rebuild it, run `npm ci` and `npm pack` in the Metrics repository’s `packages/sdk` directory.

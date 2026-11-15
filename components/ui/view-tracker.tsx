@@ -4,29 +4,26 @@ import { useEffect, useRef } from "react";
 import { getMetricsClient } from "@/lib/metrics-client";
 
 export function ViewTracker({ slug, tags }: { slug: string; tags?: string[] }) {
-  const isFetched = useRef(false);
+  const lastSlug = useRef<string | null>(null);
 
   useEffect(() => {
-    if (isFetched.current) return;
-    
-    // Fire local DB metric increment
-    fetch("/api/metrics", {
+    if (lastSlug.current === slug) return;
+    lastSlug.current = slug;
+    const { pathname, href } = window.location;
+
+    void fetch("/api/metrics", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ slug, tags }),
-    }).catch((e) => console.log("Could not increment metric.", e));
+    }).catch(() => {});
 
-    // Also forward an event to the external metrics SDK if available
-    (async () => {
-      try {
-        const m = await getMetricsClient();
-        await m.track?.("scrawl_view", { metadata: { slug, tags } });
-      } catch {
-        // ignore
-      }
-    })();
-
-    isFetched.current = true;
+    void getMetricsClient().then((client) => {
+      client?.track("scrawl_view", {
+        path: pathname,
+        url: href,
+        metadata: { slug, tags },
+      });
+    });
   }, [slug, tags]);
 
   return null;

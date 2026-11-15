@@ -27,8 +27,8 @@ importers:
         specifier: ^3.15.0
         version: 3.15.0
       harshit-metrics:
-        specifier: ^0.2.0
-        version: 0.2.0
+        specifier: file:vendor/harshit-metrics-0.2.1.tgz
+        version: file:vendor/harshit-metrics-0.2.1.tgz
       katex:
         specifier: ^0.16.45
         version: 0.16.45
@@ -1418,8 +1418,9 @@ packages:
   gsap@3.15.0:
     resolution: {integrity: sha512-dMW4CWBTUK1AEEDeZc1g4xpPGIrSf9fJF960qbTZmN/QwZIWY5wgliS6JWl9/25fpTGJrMRtSjGtOmPnfjZB+A==}
 
-  harshit-metrics@0.2.0:
-    resolution: {integrity: sha512-2tNAljCCJAvKQs4yy0P3ccuRXvAk0r+SWx6LEAXWXNZuCDSSWPIhaqPB3ymGILoAR0WEY6VIr71QUydNl+VoZw==}
+  harshit-metrics@file:vendor/harshit-metrics-0.2.1.tgz:
+    resolution: {integrity: sha512-V7Md7DjvoFh8jTA/IuMEV4kQx92MQse3ZTCpMf2givfxWNzm6KHF0wspu6l4gOnX8IjCI3rqQvXJ74CbsmayOQ==, tarball: file:vendor/harshit-metrics-0.2.1.tgz}
+    version: 0.2.1
 
   has-bigints@1.1.0:
     resolution: {integrity: sha512-R3pbpkcIqv2Pm3dUwgjclDRVmWpTJW2DcMzcIhEXEx1oh/CEMObMm3KLmRJOdvhM7o4uQBnwr8pzRK2sJWIqfg==}
@@ -4125,7 +4126,7 @@ snapshots:
 
   gsap@3.15.0: {}
 
-  harshit-metrics@0.2.0: {}
+  harshit-metrics@file:vendor/harshit-metrics-0.2.1.tgz: {}
 
   has-bigints@1.1.0: {}
 

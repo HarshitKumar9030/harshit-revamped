@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
 import { SmoothScroller } from "@/components/provider/smooth-scroller";
+import { SiteMetrics } from "@/components/ui/site-metrics";
 import { SITE_URL } from "@/lib/seo";
 
 const space = Space_Grotesk({
@@ -47,6 +48,7 @@ export default function RootLayout({
       className={`${space.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans bg-[#FDFBF7] text-[#2C2C2C] selection:bg-[#B5D8EB] selection:text-[#2C2C2C]">
+        <SiteMetrics />
         <SmoothScroller>
           {children}
         </SmoothScroller>

@@ -13,7 +13,6 @@ import { Footer } from "@/components/sections/footer";
 import { Navbar } from "@/components/ui/navbar";
 import { Marquee } from "@/components/ui/marquee";
 import { HelloLoader } from "@/components/ui/hello-loader";
-import { HomeMetrics } from "@/components/ui/home-metrics";
 import { GithubContributions } from "@/components/sections/github-contributions";
 import { absoluteUrl, serializeJsonLd } from "@/lib/seo";
 
@@ -71,7 +70,6 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
       <HelloLoader />
-      <HomeMetrics />
       <Navbar />
       <main className="relative w-full overflow-x-hidden bg-[#F0EDE5]">
         <Hero />

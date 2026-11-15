@@ -1,16 +1,32 @@
 ---
 title: "Shipping A Full Spotify Real-Time Status App"
 date: "2026-04-19"
-excerpt: "A full production walkthrough: server-only Spotify client, now-playing API, refresh token flow, polling UI, and deploy checklist."
+updated: "2026-11-16"
+excerpt: "A full production walkthrough: server-only Spotify client, now-playing API, polling UI, and what Spotify’s 2026 changes mean for refresh tokens and Development Mode."
 tags: ["spotify", "nextjs", "api", "realtime", "production"]
 image: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853"
 ---
 
 I wanted a tiny page that answers one question, live: what am I listening to right now?
 
-Built entirely with **Next.js** (App Router), this application provides a sleek, real-time look into your current Spotify playback state. Instead of reaching out to Spotify directly from the browser (and leaking your API secrets), we funnel everything through a secure, server-rendered Next.js backend. 
+Built entirely with **Next.js** (App Router), this application provides a sleek, real-time look into your current Spotify playback state. Instead of reaching out to Spotify directly from the browser (and leaking your API secrets), we funnel everything through a secure, server-rendered Next.js backend.
 
-Here is what our complete project file hierarchy looks like:
+## What Spotify changed in 2026
+
+The [February Web API changelog](https://developer.spotify.com/documentation/web-api/references/changes/february-2026) still lists the three playback reads this kind of app needs. The portfolio widget reads the account’s current track using the first endpoint.
+
+- [`GET /me/player/currently-playing`](https://developer.spotify.com/documentation/web-api/reference/get-the-users-currently-playing-track) uses `user-read-currently-playing` to read the item currently playing.
+- [`GET /me/player`](https://developer.spotify.com/documentation/web-api/reference/get-information-about-the-users-current-playback) uses `user-read-playback-state` to read playback state and Spotify Connect device details.
+- [`GET /me/player/recently-played`](https://developer.spotify.com/documentation/web-api/reference/get-recently-played) uses `user-read-recently-played` to read recent track history. It can supply a fallback when the player is idle.
+
+These Web API calls return snapshots. I didn't find a documented account-wide stream of playback events for a status widget. The [Web Playback SDK’s `player_state_changed` event](https://developer.spotify.com/documentation/web-playback-sdk/reference#player_state_changed) describes the SDK player running in the browser. For a status widget that follows the account across devices, the implementation below still polls. If you add a history fallback, label it “Last played” and keep its timestamp separate from live progress. The history endpoint covers tracks and excludes podcast episodes. This walkthrough also skips episodes in the current item.
+
+The bigger changes are in access and authorization.
+
+- **Development Mode.** The app owner needs active Premium, and new apps are limited to five authorized users. In this build, the owner authorizes the Spotify account and visitors read the widget’s server response. Only the owner connects an account. Spotify [postponed the endpoint access changes for existing integrations](https://developer.spotify.com/blog/2026-02-06-update-on-developer-access-and-platform-security) on March 9. If you extend this build beyond playback, check the [migration guide](https://developer.spotify.com/documentation/web-api/tutorials/february-2026-migration-guide) for the library, catalog, and playlist changes that apply to your app.
+- **Refresh tokens expire.** Spotify [introduced a six-month lifetime](https://developer.spotify.com/blog/2026-06-18-refresh-token-expiration) on June 18 for new apps and July 20 for existing apps. The clock starts when the user authorizes the app. Exchanging the refresh token for an access token does not extend it. On `400 invalid_grant`, run authorization again and replace the refresh token in your deployment. Access tokens still last about an hour. [Spotify’s token refresh guide](https://developer.spotify.com/documentation/web-api/tutorials/refreshing-tokens)
+
+Here is the file layout for the standalone polling demo below. The portfolio homepage uses its own server-rendered widget.
 
 ```text
 portfolio-2026/
@@ -58,7 +74,7 @@ SPOTIFY_ACCESS_TOKEN=
 
 ## Core Spotify Module (Exact Pattern)
 
-This is the full `app/lib/spotify.ts` pattern used in the app:
+This is the server-only module for the standalone demo:
 
 ```ts
 import "server-only";
@@ -136,12 +152,14 @@ async function getAccessToken() {
     cache: "no-store",
   });
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch Spotify access token");
-  }
-
   const data = await response.json();
-  return data.access_token as string;
+  if (response.status === 400 && data.error === "invalid_grant") {
+    throw new Error("Spotify authorization expired or was revoked. Authorize again.");
+  }
+  if (!response.ok || typeof data.access_token !== "string") {
+    throw new Error(`Spotify token refresh failed (${response.status}).`);
+  }
+  return data.access_token;
 }
 
 export async function getCurrentPlayingSong(): Promise<CurrentPlayback | null> {
@@ -160,10 +178,7 @@ export async function getCurrentPlayingSong(): Promise<CurrentPlayback | null> {
   }
 
   if (!response.ok) {
-    const body = await response.text();
-    throw new Error(
-      `Spotify currently-playing request failed (${response.status}): ${body}`,
-    );
+    throw new Error(`Spotify currently-playing request failed (${response.status}).`);
   }
 
   const payload =
@@ -237,31 +252,36 @@ return () => clearInterval(int);
 
 ## How To Get A Spotify Refresh Token (Without Guesswork)
 
-This is the step most builds die on. Keep this section open while you do it.
+For a personal widget, use the [refresh token script](https://github.com/HarshitKumar9030/harshit-revamped/blob/master/scripts/spotify-refresh-token.mjs) from the portfolio repository. Add `http://127.0.0.1:8888/callback` to your Spotify app’s redirect URIs and put `SPOTIFY_CLIENT_ID` and `SPOTIFY_CLIENT_SECRET` in your ignored `.env.local`. From the repository root, run:
+
+```bash
+node --env-file=.env.local scripts/spotify-refresh-token.mjs
+```
+
+Open the printed authorization URL. The script checks the callback state and exchanges the authorization code on your machine. Copy the `SPOTIFY_REFRESH_TOKEN` line from your terminal into your local or deployment secrets. Run it again when you need to reauthorize. The default scope covers the current track. To enable history too, append `user-read-currently-playing user-read-recently-played` to the command.
+
+The steps below show the same flow manually.
 
 ### 1) Create Spotify App
 
 1. Go to Spotify Developer Dashboard.
-2. Create an app.
+2. Create an app. For Development Mode, use the Premium account that will own it.
 3. Copy `Client ID` and `Client Secret`.
-4. Add a redirect URI exactly, for example `http://127.0.0.1:3000/callback`.
+4. Register the exact callback URI your local listener serves, such as `http://127.0.0.1:3000/callback` for the manual example. Spotify accepts HTTP for literal loopback addresses. Use HTTPS for deployed callbacks. [Redirect URI rules](https://developer.spotify.com/documentation/web-api/concepts/redirect_uri)
 
 ### 2) Scopes You Need
 
-Use these scopes:
-
-- `user-read-currently-playing`
-- `user-read-playback-state`
+Request `user-read-currently-playing` for this walkthrough. Add the other scopes listed above only if you call those endpoints.
 
 ### 3) Build Authorization URL
 
 Replace placeholders and open this in the browser:
 
 ```txt
-https://accounts.spotify.com/authorize?client_id=YOUR_CLIENT_ID&response_type=code&redirect_uri=http%3A%2F%2F127.0.0.1%3A3000%2Fcallback&scope=user-read-currently-playing%20user-read-playback-state
+https://accounts.spotify.com/authorize?client_id=YOUR_CLIENT_ID&response_type=code&redirect_uri=http%3A%2F%2F127.0.0.1%3A3000%2Fcallback&scope=user-read-currently-playing&state=YOUR_RANDOM_STATE
 ```
 
-After approval, Spotify redirects to your callback with `?code=...`. Copy that `code` immediately.
+Generate a fresh random state before opening the URL. After approval, Spotify redirects to your callback with the code and state. Confirm the returned state matches, then exchange the code. [Authorization Code flow](https://developer.spotify.com/documentation/web-api/tutorials/code-flow)
 
 ### 4) Exchange Code For Refresh Token
 
@@ -284,13 +304,15 @@ SPOTIFY_CLIENT_SECRET=...
 SPOTIFY_REFRESH_TOKEN=...
 ```
 
+The five-second example suits a local walkthrough. On a public page, each open tab can add requests against the same app limit. Reuse the access token until it’s close to expiry, coalesce simultaneous server reads, and pause polling when the page is hidden. A production route should surface upstream `429` and forward `Retry-After` so the poller can wait before trying again. Use the latest `progress_ms` to animate progress locally between snapshots while the track is playing. [Spotify rate limits](https://developer.spotify.com/documentation/web-api/concepts/rate-limits)
+
 ## Production Notes That Matter
 
 - Never expose `CLIENT_SECRET` or `REFRESH_TOKEN` on client side.
 - Keep Spotify fetches server-only.
 - Return a stable JSON shape even on failure.
-- Avoid aggressive polling below `3s` unless you really need it.
-- Log error status + body for quick token debugging.
+- Choose a polling interval based on traffic and back off when Spotify rate limits you.
+- Log HTTP status and a safe error code for debugging. If refresh returns `invalid_grant`, replace the token through a fresh authorization instead of retrying it.
 
 If you only remember one thing from this post: treat Spotify credentials like database credentials, never browser credentials.
 
@@ -309,4 +331,4 @@ This is the deployed app running live:
 
 <WebsiteEmbed src="https://spotify-status-alpha.vercel.app/" title="Spotify Status Live" height={740} />
 
-I hope this scrawl saves you hours of frustration and gets your Spotify status live with confidence. The key is respecting the server boundary and handling every edge case gracefully. Happy coding!
+I hope this scrawl saves you hours of frustration and gets your Spotify status live with confidence. Keep authorization on the server and make sure you can reconnect the account when the refresh token expires.

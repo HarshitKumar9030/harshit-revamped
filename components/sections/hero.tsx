@@ -84,9 +84,10 @@ export function Hero() {
 
   return (
     <>
+      <h1 className="sr-only">Harshit Singh</h1>
       {/* DESKTOP HERO */}
       <section ref={desktopRef} className="hidden md:flex relative h-screen w-full items-center justify-center bg-[#F0EDE5] overflow-hidden">
-        <h1 className="hero-text-top absolute top-[10%] text-[12vw] font-bold leading-none tracking-tighter text-[#2A2A2A] z-0" style={{ fontFamily: "var(--font-heading)" }}>HARSHIT</h1>
+        <span aria-hidden="true" className="hero-text-top absolute top-[10%] text-[12vw] font-bold leading-none tracking-tighter text-[#2A2A2A] z-0" style={{ fontFamily: "var(--font-heading)" }}>HARSHIT</span>
         
         <div className="hero-img-container relative w-[40vh] h-[50vh] rounded-[40px] overflow-hidden z-10 will-change-transform">
           <Image
@@ -99,12 +100,12 @@ export function Hero() {
           <div className="absolute inset-0 bg-[#E5EBF5] mix-blend-multiply opacity-50 pointer-events-none" />
         </div>
 
-        <h1 className="hero-text-bottom absolute bottom-[10%] text-[10vw] font-bold leading-none tracking-tighter text-[#2A2A2A] z-0" style={{ fontFamily: "var(--font-heading)" }}>SINGH</h1>
+        <span aria-hidden="true" className="hero-text-bottom absolute bottom-[10%] text-[10vw] font-bold leading-none tracking-tighter text-[#2A2A2A] z-0" style={{ fontFamily: "var(--font-heading)" }}>SINGH</span>
       </section>
 
       {/* MOBILE HERO */}
       <section ref={mobileRef} className="flex md:hidden relative h-[100svh] w-full items-center justify-center bg-[#F0EDE5] overflow-hidden">
-        <h1 className="hero-text-top absolute top-[12%] text-[16vw] font-bold leading-none tracking-tighter text-[#2A2A2A] z-0" style={{ fontFamily: "var(--font-heading)" }}>HARSHIT</h1>
+        <span aria-hidden="true" className="hero-text-top absolute top-[12%] text-[16vw] font-bold leading-none tracking-tighter text-[#2A2A2A] z-0" style={{ fontFamily: "var(--font-heading)" }}>HARSHIT</span>
         
         <div className="hero-img-container relative w-[72vw] h-[48vh] rounded-[40px] overflow-hidden z-10 will-change-transform">
           <Image
@@ -117,7 +118,7 @@ export function Hero() {
           <div className="absolute inset-0 bg-[#E5EBF5] mix-blend-multiply opacity-50 pointer-events-none" />
         </div>
 
-        <h1 className="hero-text-bottom absolute bottom-[12%] text-[15vw] font-bold leading-none tracking-tighter text-[#2A2A2A] z-0" style={{ fontFamily: "var(--font-heading)" }}>SINGH</h1>
+        <span aria-hidden="true" className="hero-text-bottom absolute bottom-[12%] text-[15vw] font-bold leading-none tracking-tighter text-[#2A2A2A] z-0" style={{ fontFamily: "var(--font-heading)" }}>SINGH</span>
       </section>
     </>
   );

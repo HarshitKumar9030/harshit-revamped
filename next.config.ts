@@ -37,6 +37,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/scrawl/:slug.mdx",
+        destination: "/scrawl/:slug",
+        permanent: true,
+      },
+    ];
+  },
   async rewrites() {
     return [
       {

@@ -1,5 +1,5 @@
 import { getAllScrawls } from "@/lib/mdx";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
@@ -11,16 +11,24 @@ interface TagPageProps {
   params: Promise<{ tag: string }>;
 }
 
+function decodeTag(tag: string) {
+  try {
+    return decodeURIComponent(tag);
+  } catch {
+    return tag;
+  }
+}
+
 export async function generateMetadata({ params }: TagPageProps): Promise<Metadata> {
   const { tag } = await params;
-  const decodedTag = decodeURIComponent(tag).toUpperCase();
+  const decodedTag = decodeTag(tag).toUpperCase();
+  const canonical = `/scrawl/tags/${encodeURIComponent(decodeTag(tag).toLowerCase())}`;
   return { 
     title: `${decodedTag} Scrawls`,
     description: `Read technical notes and writings categorized under ${decodedTag}.`,
-    alternates: {
-      canonical: `/scrawl/tags/${encodeURIComponent(tag.toLowerCase())}`,
-    },
+    alternates: { canonical },
     openGraph: {
+      url: canonical,
       title: `${decodedTag} Scrawls`,
       description: `Read technical notes and writings categorized under ${decodedTag}.`,
       images: [{ url: "/ogimagep.png" }],
@@ -51,7 +59,8 @@ const getPlaceholderImage = (i: number) => {
 
 export default async function TagPage({ params }: TagPageProps) {
   const { tag } = await params;
-  const decodedTag = decodeURIComponent(tag).toLowerCase();
+  const originalTag = decodeTag(tag);
+  const decodedTag = originalTag.toLowerCase();
   
   const scrawls = await getAllScrawls();
   const matchedScrawls = scrawls.filter(s => 
@@ -60,6 +69,9 @@ export default async function TagPage({ params }: TagPageProps) {
 
   if (matchedScrawls.length === 0) {
     notFound();
+  }
+  if (originalTag !== decodedTag) {
+    permanentRedirect(`/scrawl/tags/${encodeURIComponent(decodedTag)}`);
   }
 
   return (

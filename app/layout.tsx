@@ -28,33 +28,11 @@ export const metadata: Metadata = {
   publisher: "Harshit Singh",
   category: "Technology",
   robots: {
-    index: true,
-    follow: true,
     googleBot: {
-      index: true,
-      follow: true,
       "max-image-preview": "large",
       "max-snippet": -1,
       "max-video-preview": -1,
     },
-  },
-  openGraph: {
-    title: "Harshit Singh · Software Engineer for Web and AI",
-    description: "Interactive web, AI, and product experiences by Harshit Singh.",
-    url: SITE_URL,
-    siteName: "Harshit Singh",
-    images: [{ url: "/ogimagep.png", width: 1200, height: 630, alt: "Harshit Singh" }],
-    locale: "en_US",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Harshit Singh · Software Engineer for Web and AI",
-    description: "Interactive web, AI, and product experiences by Harshit Singh.",
-    images: ["/ogimagep.png"],
-  },
-  alternates: {
-    canonical: SITE_URL,
   },
 };
 

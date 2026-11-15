@@ -1,5 +1,5 @@
 import { getScrawlBySlug, getAllScrawls } from "@/lib/mdx";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
@@ -28,14 +28,15 @@ export async function generateMetadata({ params } : ScrawlPageProps): Promise<Me
       title: meta.title,
       description: meta.excerpt,
       alternates: {
-        canonical: `/scrawl/${encodeURIComponent(slug)}`,
+        canonical: `/scrawl/${encodeURIComponent(meta.slug)}`,
       },
       openGraph: {
         title: meta.title,
         description: meta.excerpt,
         type: 'article',
-        url: absoluteUrl(`/scrawl/${encodeURIComponent(slug)}`),
+        url: absoluteUrl(`/scrawl/${encodeURIComponent(meta.slug)}`),
         publishedTime: meta.date,
+        modifiedTime: meta.updated,
         authors: ["Harshit Singh"],
         tags: meta.tags,
         images: meta.image ? [{ url: meta.image }] : [{ url: "/ogimagep.png" }],
@@ -69,14 +70,17 @@ export default async function ScrawlPage({ params } : ScrawlPageProps) {
     notFound();
   }
 
-  const articleUrl = absoluteUrl(`/scrawl/${encodeURIComponent(slug)}`);
+  const articlePath = `/scrawl/${encodeURIComponent(post.meta.slug)}`;
+  if (slug !== post.meta.slug) permanentRedirect(articlePath);
+
+  const articleUrl = absoluteUrl(articlePath);
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     headline: post.meta.title,
     description: post.meta.excerpt,
     datePublished: post.meta.date,
-    dateModified: post.meta.date,
+    dateModified: post.meta.updated ?? post.meta.date,
     mainEntityOfPage: articleUrl,
     url: articleUrl,
     ...(post.meta.image ? { image: absoluteUrl(post.meta.image) } : {}),

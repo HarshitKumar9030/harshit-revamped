@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   description: "Browse all writings, technical notes, and observations.",
   alternates: { canonical: "/scrawl/all" },
   openGraph: {
+    url: "/scrawl/all",
     title: "All Scrawls",
     description: "Browse all writings, technical notes, and observations.",
     images: [{ url: "/ogimagep.png" }],

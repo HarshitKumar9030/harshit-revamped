@@ -1,4 +1,5 @@
-﻿import { Hero } from "@/components/sections/hero";
+﻿import type { Metadata } from "next";
+import { Hero } from "@/components/sections/hero";
 import { About } from "@/components/sections/about";
 import { Expertise } from "@/components/sections/expertise";
 import { Manifesto } from "@/components/sections/manifesto";
@@ -15,6 +16,27 @@ import { HelloLoader } from "@/components/ui/hello-loader";
 import { HomeMetrics } from "@/components/ui/home-metrics";
 import { GithubContributions } from "@/components/sections/github-contributions";
 import { absoluteUrl, serializeJsonLd } from "@/lib/seo";
+
+export const metadata: Metadata = {
+  openGraph: {
+    title: "Harshit Singh · Software Engineer for Web and AI",
+    description: "Interactive web, AI, and product experiences by Harshit Singh.",
+    url: "/",
+    siteName: "Harshit Singh",
+    images: [{ url: "/ogimagep.png", width: 1200, height: 630, alt: "Harshit Singh" }],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Harshit Singh · Software Engineer for Web and AI",
+    description: "Interactive web, AI, and product experiences by Harshit Singh.",
+    images: ["/ogimagep.png"],
+  },
+  alternates: {
+    canonical: "/",
+  },
+};
 
 export default function Home() {
   const jsonLd = {

@@ -15,6 +15,7 @@ export const metadata: Metadata = {
   description: "A scratchpad of interactive animations, spring physics, React components, and creative developer experiments.",
   alternates: { canonical: "/experiments" },
   openGraph: {
+    url: "/experiments",
     title: "Experiments | Harshit",
     description: "A scratchpad of interactive animations, spring physics, React components, and creative developer experiments.",
     images: [{ url: "/ogimagep.png" }],

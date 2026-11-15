@@ -1,4 +1,4 @@
-export const SITE_URL = "https://harshit.page";
+export const SITE_URL = "https://www.harshit.page";
 
 export function absoluteUrl(path: string) {
   return new URL(path, SITE_URL).toString();

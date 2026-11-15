@@ -8,6 +8,7 @@ export type ScrawlMeta = {
   title: string;
   smallTitle?: string;
   date: string;
+  updated?: string;
   excerpt: string;
   slug: string;
   tags?: string[];

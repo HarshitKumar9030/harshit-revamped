@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   description: "Browse writings and notes by topics.",
   alternates: { canonical: "/scrawl/tags" },
   openGraph: {
+    url: "/scrawl/tags",
     title: "Scrawl Tags",
     description: "Browse writings and notes by topics.",
     images: [{ url: "/ogimagep.png" }],

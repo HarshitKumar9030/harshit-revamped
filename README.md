@@ -37,6 +37,6 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## Analytics
 
-Set `NEXT_PUBLIC_HARSHIT_METRICS_KEY` to your project’s browser ingestion key before building. Optionally set `NEXT_PUBLIC_METRICS_ENDPOINT` to the full collector URL for a self-hosted Metrics instance. Without a key, the external tracker stays off. Scrawl view counts still use the site’s own database.
+Set `NEXT_PUBLIC_HARSHIT_METRICS_KEY` to your project’s browser ingestion key before building. The browser sends analytics batches to the same-origin `/api/system-sync` route, which forwards them to the Metrics collector. Without a key, the SDK stays off. Scrawl view counts still use the site’s own database.
 
 The site installs the checked-in SDK tarball until this version is available on npm. To rebuild it, run `npm ci` and `npm pack` in the Metrics repository’s `packages/sdk` directory.

@@ -8,7 +8,7 @@ export async function getMetricsClient(): Promise<MetricsClient | undefined> {
 
   clientPromise ??= import("harshit-metrics").then(({ createMetricsClient }) => {
     const client = createMetricsClient(apiKey, {
-      endpoint: process.env.NEXT_PUBLIC_METRICS_ENDPOINT || undefined,
+      endpoint: "/api/system-sync",
       autoTrackPageviews: false,
       autoTrackRouteChanges: false,
       autoTrackClicks: true,

@@ -14,7 +14,7 @@ import { CrunchySeason } from "@/components/sections/crunchy-season";
 
 function CustomLink(props: any) {
   const href = props.href;
-  const classes = "text-[#111111] font-bold px-1 py-0.5 mix-blend-luminosity hover:bg-[#111111] hover:text-[#FDFBF7] transition-all duration-300 underline decoration-[#111111]/30 hover:decoration-transparent underline-offset-4";
+  const classes = "text-[#111111] font-bold px-1 py-0.5 mix-blend-luminosity hover:bg-[#111111] hover:text-[#FDFBF7] [&_code]:text-inherit transition-all duration-300 underline decoration-[#111111]/30 hover:decoration-transparent underline-offset-4";
   if (href.startsWith("/")) {
     return (
       <Link href={href} {...props} className={classes}>
